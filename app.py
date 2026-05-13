@@ -52,15 +52,14 @@ if menu == "Dashboard":
     res = supabase.table("cobrancas").select("*").execute()
     df = pd.DataFrame(res.data)
 
-    if not df.empty:
-        total = len(df)
-        valor_total = df["valor_cobrado"].sum()
+    try:
+        df["valor_cobrado"] = pd.to_numeric(df["valor_cobrado"], errors="coerce")
+        valor_total = df["valor_cobrado"].fillna(0).sum()
+        valor_formatado = f"R$ {float(valor_total):,.2f}"
+    except:
+        valor_formatado = "R$ 0,00"
 
-        col1, col2 = st.columns(2)
-
-        col1.metric("Total de Registros", total)
-        col2.metric("Valor Total", f"R$ {valor_total:,.2f}")
-
+    col2.metric("Valor Total", valor_formatado)
 # =============================
 # CONSULTA
 # =============================
