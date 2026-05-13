@@ -46,15 +46,14 @@ st.sidebar.caption("Sistema de Cobranças v1.0")
 # =============================
 # DASHBOARD
 # =============================
-# =============================
-# DASHBOARD
-# =============================
 if menu == "Dashboard":
     st.title("📊 Dashboard")
 
+    # 🔢 Total de registros (correto)
     res_count = supabase.table("cobrancas").select("*", count="exact").limit(1).execute()
-    total = res_count.count
+    total = res_count.count or 0
 
+    # 💰 Valor total (correto via função SQL)
     res_total = supabase.rpc("total_valor_cobrado").execute()
     valor_total = res_total.data or 0
 
@@ -64,6 +63,7 @@ if menu == "Dashboard":
 
     col1.metric("Total de Registros", total)
     col2.metric("Valor Total", valor_formatado)
+
 # =============================
 # CONSULTA
 # =============================
@@ -123,8 +123,11 @@ elif menu == "Editar":
         if res.data:
             r = res.data[0]
 
-            novo_pagador = st.text_input("Pagador", r["pagador"])
-            novo_valor = st.number_input("Valor", value=float(r["valor_cobrado"] or 0))
+            novo_pagador = st.text_input("Pagador", r.get("pagador", ""))
+            novo_valor = st.number_input(
+                "Valor",
+                value=float(r.get("valor_cobrado") or 0)
+            )
 
             if st.button("Salvar"):
                 supabase.table("cobrancas").update({
