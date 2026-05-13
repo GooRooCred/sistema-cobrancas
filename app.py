@@ -52,26 +52,18 @@ st.sidebar.caption("Sistema de Cobranças v1.0")
 if menu == "Dashboard":
     st.title("📊 Dashboard")
 
-    res = supabase.table("cobrancas").select("*").execute()
-    df = pd.DataFrame(res.data)
+    res_count = supabase.table("cobrancas").select("*", count="exact").limit(1).execute()
+    total = res_count.count
 
-    if not df.empty:
-        total = len(df)
+    res_total = supabase.rpc("total_valor_cobrado").execute()
+    valor_total = res_total.data or 0
 
-        col1, col2 = st.columns(2)
+    valor_formatado = f"R$ {float(valor_total):,.2f}"
 
-        col1.metric("Total de Registros", total)
+    col1, col2 = st.columns(2)
 
-        try:
-            df["valor_cobrado"] = pd.to_numeric(df["valor_cobrado"], errors="coerce")
-            valor_total = df["valor_cobrado"].fillna(0).sum()
-            valor_formatado = f"R$ {float(valor_total):,.2f}"
-        except:
-            valor_formatado = "R$ 0,00"
-
-        col2.metric("Valor Total", valor_formatado)
-    else:
-        st.info("Nenhum dado encontrado.")
+    col1.metric("Total de Registros", total)
+    col2.metric("Valor Total", valor_formatado)
 # =============================
 # CONSULTA
 # =============================
