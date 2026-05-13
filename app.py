@@ -6,8 +6,8 @@ from datetime import datetime
 # =============================
 # CONFIG
 # =============================
-SUPABASE_URL = "SUA_URL"
-SUPABASE_KEY = "SUA_KEY"
+SUPABASE_URL = "https://pbwkygsohtnotzdzfsfp.supabase.co"
+SUPABASE_KEY = "sb_publishable_GZQLNBq0Ag8UMxNWZZs_Dg_B_bdejTc"
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
