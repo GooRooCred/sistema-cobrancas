@@ -22,10 +22,18 @@ def to_float(valor):
         if valor is None:
             return 0.0
 
-        if isinstance(valor, str):
+        # se já for número
+        if isinstance(valor, (int, float)):
+            return float(valor)
+
+        valor = str(valor).strip()
+
+        # se tiver vírgula (formato BR)
+        if "," in valor:
             valor = valor.replace(".", "").replace(",", ".")
 
         return float(valor)
+
     except:
         return 0.0
 #================================
@@ -94,11 +102,15 @@ if menu == "Dashboard":
     valor_total = res_total.data or 0
 
     res_osc = supabase.table("cobrancas").select("oscilacao").execute()
-
     df_osc = pd.DataFrame(res_osc.data)
     
     if "oscilacao" in df_osc.columns:
-        total_oscilacao = df_osc["oscilacao"].apply(to_float).sum()
+    
+        # 🔥 CONVERSÃO CORRETA
+        df_osc["oscilacao"] = df_osc["oscilacao"].apply(to_float)
+    
+        total_oscilacao = df_osc["oscilacao"].sum()
+    
     else:
         total_oscilacao = 0
 
