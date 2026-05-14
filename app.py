@@ -1,6 +1,7 @@
 import streamlit as st
 from supabase import create_client
 import pandas as pd
+import numpy as np
 
 # =============================
 # CONFIG
@@ -32,9 +33,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# =============================
-# MENU
-# =============================
 # =============================
 # MENU
 # =============================
@@ -147,30 +145,59 @@ elif menu == "Inserir":
         st.markdown("---")
 
         # 📤 UPLOAD
-        arquivo = st.file_uploader("Selecione o arquivo (.xlsx)", type=["xlsx"])
+arquivo = st.file_uploader("Selecione o arquivo (.xlsx)", type=["xlsx"])
 
-        if arquivo:
-            df = pd.read_excel(arquivo)
+if arquivo:
+    df = pd.read_excel(arquivo)
 
-            colunas_minimas = ["boleto"]
+    # =============================
+    # 🔥 LIMPEZA OBRIGATÓRIA (CORREÇÃO DO ERRO)
+    # =============================
+    df = df.replace({np.nan: None})
 
-            colunas_faltando = [col for col in colunas_minimas if col not in df.columns]
+    # converter datas para string (evita erro JSON Supabase)
+    for col in df.columns:
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            df[col] = df[col].astype(str)
 
-            if colunas_faltando:
-                st.error(f"❌ Coluna obrigatória faltando: {colunas_faltando}")
-            else:
-                st.success("✅ Arquivo válido!")
-                st.dataframe(df.head(), use_container_width=True)
+    colunas_minimas = ["boleto"]
 
-                if st.button("Importar dados"):
-                    colunas_presentes = [col for col in todas_colunas if col in df.columns]
+    colunas_faltando = [col for col in colunas_minimas if col not in df.columns]
 
-                    dados = df[colunas_presentes].to_dict(orient="records")
+    if colunas_faltando:
+        st.error(f"❌ Coluna obrigatória faltando: {colunas_faltando}")
+    else:
+        st.success("✅ Arquivo válido!")
+        st.dataframe(df.head(), use_container_width=True)
 
-                    supabase.table("cobrancas").insert(dados).execute()
+        if st.button("Importar dados"):
 
-                    st.success(f"{len(dados)} registros inseridos com sucesso!")
+            colunas_presentes = [col for col in todas_colunas if col in df.columns]
 
+            df_final = df[colunas_presentes]
+
+            # 🔥 CONVERSÃO SEGURA
+            df_final = df_final.replace({np.nan: None})
+            dados = df_final.to_dict(orient="records")
+
+            # =============================
+            # 🔥 ENVIO EM LOTES (EVITA ERRO SUPABASE)
+            # =============================
+            batch_size = 500
+            total = len(dados)
+
+            progresso = st.progress(0)
+            status = st.empty()
+
+            for i in range(0, total, batch_size):
+                lote = dados[i:i+batch_size]
+
+                supabase.table("cobrancas").insert(lote).execute()
+
+                progresso.progress(min((i + batch_size) / total, 1.0))
+                status.text(f"Enviando {i + len(lote)} de {total}")
+
+            st.success(f"{total} registros inseridos com sucesso!")
 # =============================
 # EDITAR
 # =============================
