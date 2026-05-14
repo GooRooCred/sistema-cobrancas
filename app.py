@@ -3,6 +3,27 @@ from supabase import create_client
 import pandas as pd
 import numpy as np
 
+#FORMAT BR
+def format_brl(valor):
+    try:
+        valor = float(valor or 0)
+        return f"{valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except:
+        return "0,00"
+        
+#FORMAT FLOAT
+def to_float(valor):
+    try:
+        if valor is None:
+            return 0.0
+
+        if isinstance(valor, str):
+            valor = valor.replace(".", "").replace(",", ".")
+
+        return float(valor)
+    except:
+        return 0.0
+        
 # =============================
 # CONFIG
 # =============================
@@ -78,6 +99,17 @@ elif menu == "Consulta":
     res = query.limit(200).execute()
     df = pd.DataFrame(res.data)
 
+    valor_cols = [
+    "valor_do_titulo",
+    "oscilacao",
+    "boleto_manual",
+    "valor_cobrado"
+]
+
+for col in valor_cols:
+    if col in df.columns:
+        df[col] = df[col].apply(format_brl)
+
     st.dataframe(df, use_container_width=True)
 
 # =============================
@@ -152,6 +184,19 @@ elif menu == "Inserir":
         if arquivo:
     
             df = pd.read_excel(arquivo)
+
+            #CONVERSÃO ANTES DO IMPORT
+
+            valor_cols = [
+                "valor_do_titulo",
+                "oscilacao",
+                "boleto_manual",
+                "valor_cobrado"
+            ]
+
+            for col in valor_cols:
+                if col in df.columns:
+                    df[col] = df[col].apply(to_float)
     
             # =============================
             # 🔥 VALIDAÇÃO VISUAL (VOLTOU AQUI)
@@ -182,6 +227,10 @@ elif menu == "Inserir":
                     colunas_presentes = [col for col in todas_colunas if col in df.columns]
     
                     df_final = df[colunas_presentes]
+                    
+                    df_final = df_final.replace({np.nan: None})
+
+                    dados = df_final.to_dict(orient="records")
     
                     dados = df_final.to_dict(orient="records")
     
