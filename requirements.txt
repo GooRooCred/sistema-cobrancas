@@ -1,8 +1,5 @@
-streamlit
-supabase==2.4.0
-postgrest
-gotrue
-realtime
-storage3
-pandas
-openpyxl
+streamlit==1.35.0
+supabase==2.3.4
+pandas==2.2.2
+openpyxl==3.1.2
+httpx==0.24.1
