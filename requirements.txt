@@ -1,7 +1,8 @@
 streamlit
-supabase
+supabase==2.4.0
 postgrest
 gotrue
 realtime
 storage3
 pandas
+openpyxl
