@@ -93,11 +93,23 @@ if menu == "Dashboard":
     res_total = supabase.rpc("total_valor_cobrado").execute()
     valor_total = res_total.data or 0
 
-    valor_formatado = f"R$ {format_brl(valor_total)}"
+    res_osc = supabase.table("cobrancas").select("oscilacao").execute()
 
-    col1, col2 = st.columns(2)
+    df_osc = pd.DataFrame(res_osc.data)
+    
+    if "oscilacao" in df_osc.columns:
+        total_oscilacao = df_osc["oscilacao"].apply(to_float).sum()
+    else:
+        total_oscilacao = 0
+
+    valor_formatado = f"R$ {format_brl(valor_total)}"
+    oscilacao_formatada = f"R$ {format_brl(total_oscilacao)}"
+
+    col1, col2, col3 = st.columns(3)
+
     col1.metric("Total de Registros", total)
     col2.metric("Valor Total", valor_formatado)
+    col3.metric("Total Oscilação", oscilacao_formatada)
 
 # =============================
 # CONSULTA
