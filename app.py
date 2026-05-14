@@ -195,12 +195,29 @@ elif menu == "Inserir":
         with st.form("form_insert"):
             col1, col2 = st.columns(2)
 
-            boleto = col1.text_input("Boleto")
-            seu_numero = col2.text_input("Seu Número")
-
-            pagador = st.text_input("Pagador")
-            valor = st.number_input("Valor Cobrado", step=0.01)
-
+            boleto = col1.text_input("BOLETO")
+            seu_numero = col2.text_input("SEU NUMERO")
+            
+            pagador = st.text_input("CLIENTE")
+            
+            col3, col4 = st.columns(2)
+            
+            valor_titulo = col3.number_input("R$ TITULO", step=0.01)
+            valor_cobrado = col4.number_input("R$ COBRADO", step=0.01)
+            
+            col5, col6 = st.columns(2)
+            
+            vencimento = col5.date_input("VENCIMENTO")
+            data_pagamento = col6.date_input("DATA PAGAMENTO")
+            
+            col7, col8 = st.columns(2)
+            
+            oscilacao = col7.number_input("OSCILAÇÃO", step=0.01)
+            lote = col8.text_input("LOTE")
+            
+            observacao = st.text_area("OBSERVAÇÃO")
+            evidencia1 = st.text_input("EVIDÊNCIA")
+            
             submit = st.form_submit_button("Salvar")
 
             if submit:
@@ -208,7 +225,14 @@ elif menu == "Inserir":
                     "boleto": boleto,
                     "seu_numero": seu_numero,
                     "pagador": pagador,
-                    "valor_cobrado": valor
+                    "valor_do_titulo": valor_titulo,
+                    "valor_cobrado": valor_cobrado,
+                    "vencimento": str(vencimento),
+                    "data_da_liquidacao": str(data_pagamento),
+                    "oscilacao": oscilacao,
+                    "lote": lote,
+                    "observacao": observacao,
+                    "evidencia1": evidencia1
                 }).execute()
 
                 st.success("Registro inserido!")
