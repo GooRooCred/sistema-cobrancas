@@ -101,7 +101,9 @@ if menu == "Dashboard":
     res_total = supabase.rpc("total_valor_cobrado").execute()
     valor_total = res_total.data or 0
 
-    res_osc = supabase.table("cobrancas").select("oscilacao").execute()
+    res_osc = supabase.rpc("total_oscilacao").execute()
+    total_oscilacao = res_osc.data or 0
+    
     df_osc = pd.DataFrame(res_osc.data)
     
     if "oscilacao" in df_osc.columns:
