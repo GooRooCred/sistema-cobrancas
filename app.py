@@ -128,6 +128,10 @@ menu = st.sidebar.radio(
     ["Dashboard", "Consulta", "Inserir", "Editar", "Excluir", "Histórico"]
 )
 
+if st.sidebar.button("🚪 Logout"):
+    st.session_state["logado"] = False
+    st.rerun()
+    
 st.sidebar.markdown("---")
 st.sidebar.caption("Sistema de Cobranças v1.0")
 
