@@ -121,7 +121,12 @@ elif menu == "Consulta":
 
     filtro = st.text_input("Buscar por boleto ou pagador")
 
-    query = supabase.table("cobrancas").select("*")
+    query = supabase.table("cobrancas").select("""
+        seu_numero, boleto, vencimento, data_da_liquidacao,
+        valor_do_titulo, valor_cobrado, oscilacao, pagador,
+        lote, verba_rescisao, gooroo, fundo,
+        boleto_manual, checagem, observacao, evidencia1
+    """)
 
     if filtro:
         query = query.ilike("boleto", f"%{filtro}%")
@@ -200,8 +205,8 @@ elif menu == "Inserir":
 
         todas_colunas = [
             "seu_numero", "boleto", "vencimento", "data_da_liquidacao",
-            "valor_do_titulo", "valor_cobrado", "oscilacao", "pagador",
-            "conta_cobranca", "lote", "verba_rescisao", "gooroo", "fundo",
+            "valor_do_titulo", "valor_cobrado", "oscilacao", "pagador", 
+            "lote", "verba_rescisao", "gooroo", "fundo",
             "boleto_manual", "checagem", "observacao", "evidencia1"
         ]
 
