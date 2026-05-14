@@ -209,7 +209,7 @@ elif menu == "Inserir":
             
             vencimento = col5.date_input("VENCIMENTO")
             data_pagamento = col6.date_input("DATA PAGAMENTO")
-            st.caption(f"Data selecionada: {data_pagamento.strftime('%d/%m/%Y')}")
+            col6.date_input("DATA PAGAMENTO", format="DD/MM/YYYY")
             
             col7, col8 = st.columns(2)
             
