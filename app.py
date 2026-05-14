@@ -35,6 +35,9 @@ st.markdown("""
 # =============================
 # MENU
 # =============================
+# =============================
+# MENU
+# =============================
 menu = st.sidebar.radio(
     "📌 Menu",
     ["Dashboard", "Consulta", "Inserir", "Editar", "Excluir", "Histórico"]
@@ -46,13 +49,51 @@ st.sidebar.caption("Sistema de Cobranças v1.0")
 # =============================
 # DASHBOARD
 # =============================
+if menu == "Dashboard":
+    st.title("📊 Dashboard")
+
+    res_count = supabase.table("cobrancas").select("*", count="exact").limit(1).execute()
+    total = res_count.count or 0
+
+    res_total = supabase.rpc("total_valor_cobrado").execute()
+    valor_total = res_total.data or 0
+
+    valor_formatado = f"R$ {float(valor_total):,.2f}"
+
+    col1, col2 = st.columns(2)
+    col1.metric("Total de Registros", total)
+    col2.metric("Valor Total", valor_formatado)
+
+# =============================
+# CONSULTA
+# =============================
+elif menu == "Consulta":
+    st.title("🔎 Consulta")
+
+    filtro = st.text_input("Buscar por boleto ou pagador")
+
+    query = supabase.table("cobrancas").select("*")
+
+    if filtro:
+        query = query.ilike("boleto", f"%{filtro}%")
+
+    res = query.limit(200).execute()
+    df = pd.DataFrame(res.data)
+
+    st.dataframe(df, use_container_width=True)
+
+# =============================
+# INSERIR (COMPLETO)
+# =============================
 elif menu == "Inserir":
+    import io
+
     st.title("➕ Inserir Registros")
 
     aba = st.radio("Escolha o tipo de inserção:", ["Manual", "Importar Excel"])
 
     # =============================
-    # INSERÇÃO MANUAL
+    # MANUAL
     # =============================
     if aba == "Manual":
         with st.form("form_insert"):
@@ -77,11 +118,9 @@ elif menu == "Inserir":
                 st.success("Registro inserido!")
 
     # =============================
-    # IMPORTAÇÃO EXCEL
+    # IMPORTAR EXCEL
     # =============================
     elif aba == "Importar Excel":
-        import io
-
         st.subheader("📂 Importar arquivo Excel")
 
         todas_colunas = [
@@ -91,7 +130,7 @@ elif menu == "Inserir":
             "boleto_manual", "checagem", "observacao", "evidencia1"
         ]
 
-        # 📥 Modelo
+        # 📥 MODELO
         df_modelo = pd.DataFrame(columns=todas_colunas)
 
         buffer = io.BytesIO()
@@ -107,7 +146,7 @@ elif menu == "Inserir":
 
         st.markdown("---")
 
-        # 📤 Upload
+        # 📤 UPLOAD
         arquivo = st.file_uploader("Selecione o arquivo (.xlsx)", type=["xlsx"])
 
         if arquivo:
@@ -130,32 +169,7 @@ elif menu == "Inserir":
 
                     supabase.table("cobrancas").insert(dados).execute()
 
-                    st.success(f"{len(dados)} registros inseridos com sucesso!")# =============================
-# INSERIR
-# =============================
-elif menu == "Inserir":
-    st.title("➕ Novo Registro")
-
-    with st.form("form_insert"):
-        col1, col2 = st.columns(2)
-
-        boleto = col1.text_input("Boleto")
-        seu_numero = col2.text_input("Seu Número")
-
-        pagador = st.text_input("Pagador")
-        valor = st.number_input("Valor Cobrado", step=0.01)
-
-        submit = st.form_submit_button("Salvar")
-
-        if submit:
-            supabase.table("cobrancas").insert({
-                "boleto": boleto,
-                "seu_numero": seu_numero,
-                "pagador": pagador,
-                "valor_cobrado": valor
-            }).execute()
-
-            st.success("Registro inserido!")
+                    st.success(f"{len(dados)} registros inseridos com sucesso!")
 
 # =============================
 # EDITAR
@@ -172,10 +186,7 @@ elif menu == "Editar":
             r = res.data[0]
 
             novo_pagador = st.text_input("Pagador", r.get("pagador", ""))
-            novo_valor = st.number_input(
-                "Valor",
-                value=float(r.get("valor_cobrado") or 0)
-            )
+            novo_valor = st.number_input("Valor", value=float(r.get("valor_cobrado") or 0))
 
             if st.button("Salvar"):
                 supabase.table("cobrancas").update({
