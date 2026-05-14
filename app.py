@@ -114,47 +114,34 @@ elif menu == "Consulta":
 
     res = query.limit(200).execute()
     df = pd.DataFrame(res.data)
-#===========================
-# FORMATAR VALORES
-#===========================
+
+    # =========================
+    # FORMATAR VALORES
+    # =========================
     valor_cols = [
         "valor_do_titulo",
         "oscilacao",
         "boleto_manual",
         "valor_cobrado"
     ]
-    
+
     for col in valor_cols:
         if col in df.columns:
             df[col] = df[col].apply(format_brl)
 
-# =========================
-# FORMATAR DATAS
-# =========================
+    # =========================
+    # FORMATAR DATAS
+    # =========================
     data_cols = [
         "vencimento",
         "data_da_liquidacao"
     ]
-    
+
     for col in data_cols:
         if col in df.columns:
             df[col] = df[col].apply(format_data_br)
-    
+
     st.dataframe(df, use_container_width=True)
-    
-        # 🔥 FORMATAÇÃO BR
-        valor_cols = [
-            "valor_do_titulo",
-            "oscilacao",
-            "boleto_manual",
-            "valor_cobrado"
-        ]
-    
-        for col in valor_cols:
-            if col in df.columns:
-                df[col] = df[col].apply(format_brl)
-    
-        st.dataframe(df, use_container_width=True)
 
 # =============================
 # INSERIR
