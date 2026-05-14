@@ -208,23 +208,46 @@ elif menu == "Editar":
 
     boleto = st.text_input("Digite o boleto")
 
-    if st.button("Buscar"):
+    # =========================
+    # BUSCAR REGISTRO
+    # =========================
+    if st.button("Buscar") and boleto:
         res = supabase.table("cobrancas").select("*").eq("boleto", boleto).execute()
 
         if res.data:
-            r = res.data[0]
+            st.session_state["registro"] = res.data[0]
+            st.session_state["boleto_edit"] = boleto
+        else:
+            st.warning("Boleto não encontrado")
 
-            novo_pagador = st.text_input("Pagador", r.get("pagador", ""))
-            novo_valor = st.number_input("Valor", value=float(r.get("valor_cobrado") or 0))
+    # =========================
+    # FORMULÁRIO DE EDIÇÃO
+    # =========================
+    if "registro" in st.session_state:
 
-            if st.button("Salvar"):
-                supabase.table("cobrancas").update({
-                    "pagador": novo_pagador,
-                    "valor_cobrado": novo_valor
-                }).eq("boleto", boleto).execute()
+        r = st.session_state["registro"]
 
-                st.success("Atualizado!")
+        novo_pagador = st.text_input("Pagador", value=r.get("pagador", ""))
+        novo_valor = st.number_input(
+            "Valor",
+            value=float(r.get("valor_cobrado") or 0)
+        )
 
+        # =========================
+        # SALVAR ALTERAÇÕES
+        # =========================
+        if st.button("Salvar alterações"):
+
+            supabase.table("cobrancas").update({
+                "pagador": novo_pagador,
+                "valor_cobrado": novo_valor
+            }).eq("boleto", st.session_state["boleto_edit"]).execute()
+
+            st.success("Atualizado com sucesso!")
+
+            # limpa memória
+            del st.session_state["registro"]
+            del st.session_state["boleto_edit"]
 # =============================
 # EXCLUIR
 # =============================
