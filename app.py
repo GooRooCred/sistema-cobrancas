@@ -208,7 +208,6 @@ elif menu == "Inserir":
             col5, col6 = st.columns(2)
             
             vencimento = col5.date_input("VENCIMENTO")
-            data_pagamento = col6.date_input("DATA PAGAMENTO")
             col6.date_input("DATA PAGAMENTO", format="DD/MM/YYYY")
             
             col7, col8 = st.columns(2)
