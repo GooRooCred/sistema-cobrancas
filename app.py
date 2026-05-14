@@ -124,8 +124,7 @@ elif menu == "Consulta":
     query = supabase.table("cobrancas").select("""
         seu_numero, boleto, vencimento, data_da_liquidacao,
         valor_do_titulo, valor_cobrado, oscilacao, pagador,
-        lote, verba_rescisao, gooroo, fundo,
-        boleto_manual, checagem, observacao, evidencia1
+        lote, boleto_manual, checagem, observacao, evidencia1
     """)
 
     if filtro:
@@ -206,8 +205,7 @@ elif menu == "Inserir":
         todas_colunas = [
             "seu_numero", "boleto", "vencimento", "data_da_liquidacao",
             "valor_do_titulo", "valor_cobrado", "oscilacao", "pagador", 
-            "lote", "verba_rescisao", "gooroo", "fundo",
-            "boleto_manual", "checagem", "observacao", "evidencia1"
+            "lote","boleto_manual", "checagem", "observacao", "evidencia1"
         ]
 
         # MODELO
