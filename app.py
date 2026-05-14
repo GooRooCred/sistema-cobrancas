@@ -67,21 +67,96 @@ if menu == "Dashboard":
 # =============================
 # CONSULTA
 # =============================
-elif menu == "Consulta":
-    st.title("🔎 Consulta")
+elif menu == "Inserir":
+    st.title("➕ Inserir Registros")
 
-    filtro = st.text_input("Buscar por boleto ou pagador")
+    aba = st.radio("Escolha o tipo de inserção:", ["Manual", "Importar Excel"])
 
-    query = supabase.table("cobrancas").select("*")
+    # =============================
+    # INSERÇÃO MANUAL
+    # =============================
+    if aba == "Manual":
+        with st.form("form_insert"):
+            col1, col2 = st.columns(2)
 
-    if filtro:
-        query = query.ilike("boleto", f"%{filtro}%")
+            boleto = col1.text_input("Boleto")
+            seu_numero = col2.text_input("Seu Número")
 
-    res = query.limit(200).execute()
-    df = pd.DataFrame(res.data)
+            pagador = st.text_input("Pagador")
+            valor = st.number_input("Valor Cobrado", step=0.01)
 
-    st.dataframe(df, use_container_width=True)
+            submit = st.form_submit_button("Salvar")
 
+            if submit:
+                supabase.table("cobrancas").insert({
+                    "boleto": boleto,
+                    "seu_numero": seu_numero,
+                    "pagador": pagador,
+                    "valor_cobrado": valor
+                }).execute()
+
+                st.success("Registro inserido!")
+
+   
+import io
+
+# =============================
+# IMPORTAÇÃO EXCEL
+# =============================
+else:
+    st.subheader("📂 Importar arquivo Excel")
+
+    # 📄 Colunas do modelo
+    todas_colunas = [
+        "seu_numero", "boleto", "vencimento", "data_da_liquidacao",
+        "valor_do_titulo", "valor_cobrado", "oscilacao", "pagador",
+        "conta_cobranca", "lote", "verba_rescisao", "gooroo", "fundo",
+        "boleto_manual", "checagem", "observacao", "evidencia1"
+    ]
+
+    # 📥 BOTÃO DE DOWNLOAD DO MODELO
+    df_modelo = pd.DataFrame(columns=todas_colunas)
+
+    buffer = io.BytesIO()
+    df_modelo.to_excel(buffer, index=False)
+    buffer.seek(0)
+
+    st.download_button(
+        label="📥 Baixar modelo Excel",
+        data=buffer,
+        file_name="modelo_importacao.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    st.markdown("---")
+
+    # 📤 Upload
+    arquivo = st.file_uploader("Selecione o arquivo (.xlsx)", type=["xlsx"])
+
+    if arquivo:
+        df = pd.read_excel(arquivo)
+
+        # 🔎 Colunas mínimas (recomendado ter)
+        colunas_minimas = ["boleto"]
+
+        colunas_faltando = [col for col in colunas_minimas if col not in df.columns]
+
+        if colunas_faltando:
+            st.error(f"❌ Coluna obrigatória faltando: {colunas_faltando}")
+        else:
+            st.success("✅ Arquivo válido!")
+
+            st.dataframe(df.head(), use_container_width=True)
+
+            if st.button("Importar dados"):
+                # 🔧 Mantém só colunas que existem no arquivo
+                colunas_presentes = [col for col in todas_colunas if col in df.columns]
+
+                dados = df[colunas_presentes].to_dict(orient="records")
+
+                supabase.table("cobrancas").insert(dados).execute()
+
+                st.success(f"{len(dados)} registros inseridos com sucesso!")
 # =============================
 # INSERIR
 # =============================
