@@ -120,86 +120,86 @@ elif menu == "Inserir":
     # =============================
     elif aba == "Importar Excel":
 
-    st.subheader("📂 Importar arquivo Excel")
-
-    todas_colunas = [
-        "seu_numero", "boleto", "vencimento", "data_da_liquidacao",
-        "valor_do_titulo", "valor_cobrado", "oscilacao", "pagador",
-        "conta_cobranca", "lote", "verba_rescisao", "gooroo", "fundo",
-        "boleto_manual", "checagem", "observacao", "evidencia1"
-    ]
-
-    # 📥 MODELO
-    import io
-    df_modelo = pd.DataFrame(columns=todas_colunas)
-
-    buffer = io.BytesIO()
-    df_modelo.to_excel(buffer, index=False)
-    buffer.seek(0)
-
-    st.download_button(
-        label="📥 Baixar modelo Excel",
-        data=buffer,
-        file_name="modelo_importacao.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-
-    st.markdown("---")
-
-    # 📤 UPLOAD
-    arquivo = st.file_uploader("Selecione o arquivo (.xlsx)", type=["xlsx"])
-
-    if arquivo:
-
-        df = pd.read_excel(arquivo)
-
-        # =============================
-        # 🔥 VALIDAÇÃO VISUAL (VOLTOU AQUI)
-        # =============================
-        colunas_minimas = ["boleto"]
-
-        colunas_faltando = [col for col in colunas_minimas if col not in df.columns]
-
-        if colunas_faltando:
-            st.error(f"❌ Colunas obrigatórias faltando: {colunas_faltando}")
-
-        else:
-            st.success("✅ Arquivo válido!")
-
-            # 🔥 MOSTRAR DADOS (PREVIEW)
-            st.write("📊 Prévia dos dados importados:")
-            st.dataframe(df.head(20), use_container_width=True)
-
-            st.write(f"📌 Total de linhas: {len(df)}")
-
+        st.subheader("📂 Importar arquivo Excel")
+    
+        todas_colunas = [
+            "seu_numero", "boleto", "vencimento", "data_da_liquidacao",
+            "valor_do_titulo", "valor_cobrado", "oscilacao", "pagador",
+            "conta_cobranca", "lote", "verba_rescisao", "gooroo", "fundo",
+            "boleto_manual", "checagem", "observacao", "evidencia1"
+        ]
+    
+        # 📥 MODELO
+        import io
+        df_modelo = pd.DataFrame(columns=todas_colunas)
+    
+        buffer = io.BytesIO()
+        df_modelo.to_excel(buffer, index=False)
+        buffer.seek(0)
+    
+        st.download_button(
+            label="📥 Baixar modelo Excel",
+            data=buffer,
+            file_name="modelo_importacao.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    
+        st.markdown("---")
+    
+        # 📤 UPLOAD
+        arquivo = st.file_uploader("Selecione o arquivo (.xlsx)", type=["xlsx"])
+    
+        if arquivo:
+    
+            df = pd.read_excel(arquivo)
+    
             # =============================
-            # LIMPEZA
+            # 🔥 VALIDAÇÃO VISUAL (VOLTOU AQUI)
             # =============================
-            df = df.replace({np.nan: None})
-
-            if st.button("Importar dados"):
-
-                colunas_presentes = [col for col in todas_colunas if col in df.columns]
-
-                df_final = df[colunas_presentes]
-
-                dados = df_final.to_dict(orient="records")
-
-                batch_size = 500
-                total = len(dados)
-
-                progresso = st.progress(0)
-                status = st.empty()
-
-                for i in range(0, total, batch_size):
-                    lote = dados[i:i+batch_size]
-
-                    supabase.table("cobrancas").insert(lote).execute()
-
-                    progresso.progress(min((i + batch_size) / total, 1.0))
-                    status.text(f"Enviando {i + len(lote)} de {total}")
-
-                st.success(f"✅ {total} registros inseridos com sucesso!")
+            colunas_minimas = ["boleto"]
+    
+            colunas_faltando = [col for col in colunas_minimas if col not in df.columns]
+    
+            if colunas_faltando:
+                st.error(f"❌ Colunas obrigatórias faltando: {colunas_faltando}")
+    
+            else:
+                st.success("✅ Arquivo válido!")
+    
+                # 🔥 MOSTRAR DADOS (PREVIEW)
+                st.write("📊 Prévia dos dados importados:")
+                st.dataframe(df.head(20), use_container_width=True)
+    
+                st.write(f"📌 Total de linhas: {len(df)}")
+    
+                # =============================
+                # LIMPEZA
+                # =============================
+                df = df.replace({np.nan: None})
+    
+                if st.button("Importar dados"):
+    
+                    colunas_presentes = [col for col in todas_colunas if col in df.columns]
+    
+                    df_final = df[colunas_presentes]
+    
+                    dados = df_final.to_dict(orient="records")
+    
+                    batch_size = 500
+                    total = len(dados)
+    
+                    progresso = st.progress(0)
+                    status = st.empty()
+    
+                    for i in range(0, total, batch_size):
+                        lote = dados[i:i+batch_size]
+    
+                        supabase.table("cobrancas").insert(lote).execute()
+    
+                        progresso.progress(min((i + batch_size) / total, 1.0))
+                        status.text(f"Enviando {i + len(lote)} de {total}")
+    
+                    st.success(f"✅ {total} registros inseridos com sucesso!")
 # =============================
 # EDITAR
 # =============================
