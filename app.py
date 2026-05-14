@@ -6,7 +6,7 @@ import pandas as pd
 # CONFIG
 # =============================
 SUPABASE_URL = "https://pbwkygsohtnotzdzfsfp.supabase.co"
-SUPABASE_KEY = "sb_publishable_GZQLNBq0Ag8UMxNWZZs_Dg_B_bdejTc"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBid2t5Z3NvaHRub3R6ZHpmc2ZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NjUwMzUsImV4cCI6MjA5NDA0MTAzNX0.k-_QpRkDWt4N4oCCC5-BGA-2n8JR3X8VHbhxGGxyqbs"
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
