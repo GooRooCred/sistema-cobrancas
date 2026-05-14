@@ -36,6 +36,22 @@ def to_float(valor):
 
     except:
         return 0.0
+        
+COLUNAS_AMIGAVEIS = {
+    "seu_numero": "SEU NUMERO",
+    "boleto": "BOLETO",
+    "vencimento": "VENCIMENTO",
+    "data_da_liquidacao": "DATA PAGAMENTO",
+    "valor_do_titulo": "R$ TITULO",
+    "valor_cobrado": "R$ COBRADO",
+    "oscilacao": "OSCILAÇÃO",
+    "pagador": "CLIENTE",
+    "lote": "LOTE",
+    "boleto_manual": "BOLETO MANUAL",
+    "checagem": "VALIDAÇÃO",
+    "observacao": "OBSERVAÇÃO",
+    "evidencia1": "EVIDÊNCIA"
+}
 #================================
 # FUNÇÃO DATA BR
 #================================
@@ -158,6 +174,8 @@ elif menu == "Consulta":
     for col in data_cols:
         if col in df.columns:
             df[col] = df[col].apply(format_data_br)
+            
+    df = df.rename(columns=COLUNAS_AMIGAVEIS)
 
     st.dataframe(df, use_container_width=True)
 
