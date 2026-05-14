@@ -238,16 +238,24 @@ elif menu == "Editar":
         # =========================
         if st.button("Salvar alterações"):
 
+            # =========================
+            # SALVA HISTÓRICO PRIMEIRO
+            # =========================
+            supabase.table("cobrancas_log").insert({
+                "boleto": st.session_state["boleto_edit"],
+                "pagador": novo_pagador,
+                "valor_cobrado": novo_valor
+            }).execute()
+        
+            # =========================
+            # ATUALIZA TABELA PRINCIPAL
+            # =========================
             supabase.table("cobrancas").update({
                 "pagador": novo_pagador,
                 "valor_cobrado": novo_valor
             }).eq("boleto", st.session_state["boleto_edit"]).execute()
-
-            st.success("Atualizado com sucesso!")
-
-            # limpa memória
-            del st.session_state["registro"]
-            del st.session_state["boleto_edit"]
+        
+            st.success("Atualizado e registrado no histórico!")
 # =============================
 # EXCLUIR
 # =============================
