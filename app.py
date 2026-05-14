@@ -2,16 +2,21 @@ import streamlit as st
 from supabase import create_client
 import pandas as pd
 import numpy as np
+import io
 
-#FORMAT BR
+# =============================
+# FORMAT BR
+# =============================
 def format_brl(valor):
     try:
         valor = float(valor or 0)
         return f"{valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     except:
         return "0,00"
-        
-#FORMAT FLOAT
+
+# =============================
+# FORMAT FLOAT
+# =============================
 def to_float(valor):
     try:
         if valor is None:
@@ -23,7 +28,7 @@ def to_float(valor):
         return float(valor)
     except:
         return 0.0
-        
+
 # =============================
 # CONFIG
 # =============================
@@ -99,24 +104,24 @@ elif menu == "Consulta":
     res = query.limit(200).execute()
     df = pd.DataFrame(res.data)
 
+    # 🔥 FORMATAÇÃO BR
     valor_cols = [
-    "valor_do_titulo",
-    "oscilacao",
-    "boleto_manual",
-    "valor_cobrado"
-]
+        "valor_do_titulo",
+        "oscilacao",
+        "boleto_manual",
+        "valor_cobrado"
+    ]
 
-for col in valor_cols:
-    if col in df.columns:
-        df[col] = df[col].apply(format_brl)
+    for col in valor_cols:
+        if col in df.columns:
+            df[col] = df[col].apply(format_brl)
 
     st.dataframe(df, use_container_width=True)
 
 # =============================
-# INSERIR (COMPLETO)
+# INSERIR
 # =============================
 elif menu == "Inserir":
-    import io
 
     st.title("➕ Inserir Registros")
 
@@ -148,45 +153,41 @@ elif menu == "Inserir":
                 st.success("Registro inserido!")
 
     # =============================
-    # IMPORTAR EXCEL (SÓ AQUI!)
+    # IMPORTAR EXCEL
     # =============================
     elif aba == "Importar Excel":
 
         st.subheader("📂 Importar arquivo Excel")
-    
+
         todas_colunas = [
             "seu_numero", "boleto", "vencimento", "data_da_liquidacao",
             "valor_do_titulo", "valor_cobrado", "oscilacao", "pagador",
             "conta_cobranca", "lote", "verba_rescisao", "gooroo", "fundo",
             "boleto_manual", "checagem", "observacao", "evidencia1"
         ]
-    
-        # 📥 MODELO
-        import io
+
+        # MODELO
         df_modelo = pd.DataFrame(columns=todas_colunas)
-    
+
         buffer = io.BytesIO()
         df_modelo.to_excel(buffer, index=False)
         buffer.seek(0)
-    
+
         st.download_button(
             label="📥 Baixar modelo Excel",
             data=buffer,
             file_name="modelo_importacao.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
-    
+
         st.markdown("---")
-    
-        # 📤 UPLOAD
+
         arquivo = st.file_uploader("Selecione o arquivo (.xlsx)", type=["xlsx"])
-    
+
         if arquivo:
-    
             df = pd.read_excel(arquivo)
 
-            #CONVERSÃO ANTES DO IMPORT
-
+            # 🔥 CONVERSÃO NUMÉRICA
             valor_cols = [
                 "valor_do_titulo",
                 "oscilacao",
@@ -197,58 +198,41 @@ elif menu == "Inserir":
             for col in valor_cols:
                 if col in df.columns:
                     df[col] = df[col].apply(to_float)
-    
-            # =============================
-            # 🔥 VALIDAÇÃO VISUAL (VOLTOU AQUI)
-            # =============================
+
             colunas_minimas = ["boleto"]
-    
             colunas_faltando = [col for col in colunas_minimas if col not in df.columns]
-    
+
             if colunas_faltando:
                 st.error(f"❌ Colunas obrigatórias faltando: {colunas_faltando}")
-    
             else:
                 st.success("✅ Arquivo válido!")
-    
-                # 🔥 MOSTRAR DADOS (PREVIEW)
-                st.write("📊 Prévia dos dados importados:")
                 st.dataframe(df.head(20), use_container_width=True)
-    
                 st.write(f"📌 Total de linhas: {len(df)}")
-    
-                # =============================
-                # LIMPEZA
-                # =============================
+
                 df = df.replace({np.nan: None})
-    
+
                 if st.button("Importar dados"):
-    
+
                     colunas_presentes = [col for col in todas_colunas if col in df.columns]
-    
                     df_final = df[colunas_presentes]
-                    
-                    df_final = df_final.replace({np.nan: None})
 
                     dados = df_final.to_dict(orient="records")
-    
-                    dados = df_final.to_dict(orient="records")
-    
+
                     batch_size = 500
                     total = len(dados)
-    
+
                     progresso = st.progress(0)
                     status = st.empty()
-    
+
                     for i in range(0, total, batch_size):
                         lote = dados[i:i+batch_size]
-    
                         supabase.table("cobrancas").insert(lote).execute()
-    
+
                         progresso.progress(min((i + batch_size) / total, 1.0))
                         status.text(f"Enviando {i + len(lote)} de {total}")
-    
+
                     st.success(f"✅ {total} registros inseridos com sucesso!")
+
 # =============================
 # EDITAR
 # =============================
@@ -257,9 +241,6 @@ elif menu == "Editar":
 
     boleto = st.text_input("Digite o boleto")
 
-    # =========================
-    # BUSCAR REGISTRO
-    # =========================
     if st.button("Buscar") and boleto:
         res = supabase.table("cobrancas").select("*").eq("boleto", boleto).execute()
 
@@ -269,42 +250,27 @@ elif menu == "Editar":
         else:
             st.warning("Boleto não encontrado")
 
-    # =========================
-    # FORMULÁRIO DE EDIÇÃO
-    # =========================
     if "registro" in st.session_state:
-
         r = st.session_state["registro"]
 
         novo_pagador = st.text_input("Pagador", value=r.get("pagador", ""))
-        novo_valor = st.number_input(
-            "Valor",
-            value=float(r.get("valor_cobrado") or 0)
-        )
+        novo_valor = st.number_input("Valor", value=float(r.get("valor_cobrado") or 0))
 
-        # =========================
-        # SALVAR ALTERAÇÕES
-        # =========================
         if st.button("Salvar alterações"):
 
-            # =========================
-            # SALVA HISTÓRICO PRIMEIRO
-            # =========================
             supabase.table("cobrancas_log").insert({
                 "boleto": st.session_state["boleto_edit"],
                 "pagador": novo_pagador,
                 "valor_cobrado": novo_valor
             }).execute()
-        
-            # =========================
-            # ATUALIZA TABELA PRINCIPAL
-            # =========================
+
             supabase.table("cobrancas").update({
                 "pagador": novo_pagador,
                 "valor_cobrado": novo_valor
             }).eq("boleto", st.session_state["boleto_edit"]).execute()
-        
+
             st.success("Atualizado e registrado no histórico!")
+
 # =============================
 # EXCLUIR
 # =============================
