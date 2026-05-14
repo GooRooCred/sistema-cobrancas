@@ -104,8 +104,6 @@ if menu == "Dashboard":
     res_osc = supabase.rpc("total_oscilacao").execute()
     total_oscilacao = res_osc.data or 0
     
-    df_osc = pd.DataFrame(res_osc.data)
-    
     if "oscilacao" in df_osc.columns:
     
         # 🔥 CONVERSÃO CORRETA
