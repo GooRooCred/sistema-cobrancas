@@ -82,7 +82,7 @@ if menu == "Dashboard":
     res_total = supabase.rpc("total_valor_cobrado").execute()
     valor_total = res_total.data or 0
 
-    valor_formatado = f"R$ {float(valor_total):,.2f}"
+    valor_formatado = f"R$ {format_brl(valor_total)}"
 
     col1, col2 = st.columns(2)
     col1.metric("Total de Registros", total)
