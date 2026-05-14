@@ -1,4 +1,8 @@
 streamlit
 supabase
+pandas
+openpyxl
+streamlit
+numpy
 pandas>=2.2
 pillow>=10.4
