@@ -103,16 +103,6 @@ if menu == "Dashboard":
 
     res_osc = supabase.rpc("total_oscilacao").execute()
     total_oscilacao = res_osc.data or 0
-    
-    if "oscilacao" in df_osc.columns:
-    
-        # 🔥 CONVERSÃO CORRETA
-        df_osc["oscilacao"] = df_osc["oscilacao"].apply(to_float)
-    
-        total_oscilacao = df_osc["oscilacao"].sum()
-    
-    else:
-        total_oscilacao = 0
 
     valor_formatado = f"R$ {format_brl(valor_total)}"
     oscilacao_formatada = f"R$ {format_brl(total_oscilacao)}"
