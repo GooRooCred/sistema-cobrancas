@@ -253,9 +253,10 @@ elif menu == "Inserir":
             # OSCILAÇÃO AUTOMÁTICA
             # =============================
             oscilacao = valor_cobrado - valor_titulo
-            col7.metric(
+            col7.text_input(
                 "OSCILAÇÃO",
-                f"R$ {format_brl(oscilacao)}"
+                value=format_brl(oscilacao),
+                disabled=True
             )
 
             lote = col8.text_input("LOTE")
