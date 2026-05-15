@@ -188,14 +188,15 @@ elif menu == "Consulta":
     # =============================
     # BUSCA
     # =============================
-    col1, col2 = st.columns([3,1])
-
+    col1, col2 = st.columns(
+        [4,1],
+        vertical_alignment="bottom"
+    )
+    
     filtro = col1.text_input(
         "Buscar boleto"
     )
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
+    
     buscar = col2.button(
         "Buscar",
         use_container_width=True
