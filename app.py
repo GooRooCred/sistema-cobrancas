@@ -249,7 +249,15 @@ elif menu == "Inserir":
             
             col7, col8 = st.columns(2)
             
-            oscilacao = col7.number_input("OSCILAÇÃO", step=0.01)
+            # =============================
+            # OSCILAÇÃO AUTOMÁTICA
+            # =============================
+            oscilacao = valor_cobrado - valor_titulo
+            col7.metric(
+                "OSCILAÇÃO",
+                f"R$ {format_brl(oscilacao)}"
+            )
+
             lote = col8.text_input("LOTE")
             
             observacao = st.text_area("OBSERVAÇÃO")
