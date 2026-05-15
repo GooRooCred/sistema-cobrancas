@@ -188,20 +188,72 @@ if menu == "Dashboard":
     st.title("📊 Dashboard")
 
     # =============================
-    # FILTRO DATA
+    # TOTAL GERAL
     # =============================
+    res_total = supabase.table("cobrancas") \
+        .select("*") \
+        .execute()
+
+    df_total = pd.DataFrame(res_total.data)
+
+    total_registros = len(df_total)
+
+    valor_total_geral = 0
+    oscilacao_total_geral = 0
+
+    if not df_total.empty:
+
+        if "valor_cobrado" in df_total.columns:
+            valor_total_geral = df_total["valor_cobrado"] \
+                .apply(to_float).sum()
+
+        if "oscilacao" in df_total.columns:
+            oscilacao_total_geral = df_total["oscilacao"] \
+                .apply(to_float).sum()
+
+    # =============================
+    # MÉTRICAS GERAIS
+    # =============================
+    st.subheader("📌 Visão Geral")
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric(
+        "📄 Total Registros",
+        total_registros
+    )
+
+    col2.metric(
+        "💰 Valor Total",
+        f"R$ {format_brl(valor_total_geral)}"
+    )
+
+    col3.metric(
+        "📈 Oscilação Total",
+        f"R$ {format_brl(oscilacao_total_geral)}"
+    )
+
+    st.markdown("---")
+
+    # =============================
+    # FILTRO POR DATA
+    # =============================
+    st.subheader("📅 Filtrar por Período")
+
     col_f1, col_f2 = st.columns(2)
 
     data_inicio = col_f1.date_input(
-        "Data Inicial"
+        "Data Inicial",
+        format="DD/MM/YYYY"
     )
 
     data_fim = col_f2.date_input(
-        "Data Final"
+        "Data Final",
+        format="DD/MM/YYYY"
     )
 
     # =============================
-    # QUERY
+    # QUERY FILTRO
     # =============================
     res = supabase.table("cobrancas") \
         .select("*") \
@@ -211,9 +263,6 @@ if menu == "Dashboard":
 
     df_dash = pd.DataFrame(res.data)
 
-    # =============================
-    # TOTAIS
-    # =============================
     total_boletos = len(df_dash)
 
     total_valor = 0
@@ -222,11 +271,34 @@ if menu == "Dashboard":
     if not df_dash.empty:
 
         if "valor_cobrado" in df_dash.columns:
-            total_valor = df_dash["valor_cobrado"].apply(to_float).sum()
+            total_valor = df_dash["valor_cobrado"] \
+                .apply(to_float).sum()
 
         if "oscilacao" in df_dash.columns:
-            total_oscilacao = df_dash["oscilacao"].apply(to_float).sum()
+            total_oscilacao = df_dash["oscilacao"] \
+                .apply(to_float).sum()
 
+    # =============================
+    # MÉTRICAS FILTRADAS
+    # =============================
+    st.subheader("📊 Resultado do Período")
+
+    col4, col5, col6 = st.columns(3)
+
+    col4.metric(
+        "📄 Boletos no Período",
+        total_boletos
+    )
+
+    col5.metric(
+        "💰 Valor no Período",
+        f"R$ {format_brl(total_valor)}"
+    )
+
+    col6.metric(
+        "📈 Oscilação Período",
+        f"R$ {format_brl(total_oscilacao)}"
+    )
     # =============================
     # FORMATAÇÃO
     # =============================
