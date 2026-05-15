@@ -566,6 +566,7 @@ elif menu == "Inserir":
 
         if arquivo:
             df = pd.read_excel(arquivo)
+            df["boleto"] = df["boleto"].replace("", None)
 
             # =============================
             # CONVERTE DATAS
