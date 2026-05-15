@@ -287,7 +287,7 @@ elif menu == "Consulta":
                 # datas
                 if chave in ["vencimento", "data_da_liquidacao"]:
     
-                    :
+                    try:
                         valor = pd.to_datetime(valor).strftime("%d/%m/%Y")
                     except:
                         pass
