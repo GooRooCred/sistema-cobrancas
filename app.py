@@ -308,6 +308,24 @@ elif menu == "Inserir":
         if arquivo:
             df = pd.read_excel(arquivo)
 
+            # =============================
+            # CONVERTE DATAS
+            # =============================
+            colunas_data = [
+                "vencimento",
+                "data_da_liquidacao"
+            ]
+            
+            for col in colunas_data:
+            
+                if col in df.columns:
+            
+                    df[col] = pd.to_datetime(
+                        df[col],
+                        dayfirst=True,
+                        errors="coerce"
+                    ).dt.strftime("%Y-%m-%d")
+
             # 🔥 CONVERSÃO NUMÉRICA
             valor_cols = [
                 "valor_do_titulo",
