@@ -249,39 +249,39 @@ elif menu == "Inserir":
             
         col7, col8 = st.columns(2)
             
-            # =============================
-            # OSCILAÇÃO AUTOMÁTICA
-            # =============================
-            oscilacao = valor_cobrado - valor_titulo
-            col7.text_input(
-                "OSCILAÇÃO",
-                value=format_brl(oscilacao),
-                disabled=True
-            )
+        # =============================
+        # OSCILAÇÃO AUTOMÁTICA
+        # =============================
+        oscilacao = valor_cobrado - valor_titulo
+        col7.text_input(
+            "OSCILAÇÃO",
+            value=format_brl(oscilacao),
+            disabled=True
+        )
 
-            lote = col8.text_input("LOTE")
+        lote = col8.text_input("LOTE")
             
-            observacao = st.text_area("OBSERVAÇÃO")
-            evidencia1 = st.text_input("EVIDÊNCIA")
+        observacao = st.text_area("OBSERVAÇÃO")
+        evidencia1 = st.text_input("EVIDÊNCIA")
             
-            submit = st.button("Salvar")
+        submit = st.button("Salvar")
 
-            if submit:
-                supabase.table("cobrancas").insert({
-                    "boleto": boleto,
-                    "seu_numero": seu_numero,
-                    "pagador": pagador,
-                    "valor_do_titulo": valor_titulo,
-                    "valor_cobrado": valor_cobrado,
-                    "vencimento": str(vencimento),
-                    "data_da_liquidacao": str(data_pagamento),
-                    "oscilacao": oscilacao,
-                    "lote": lote,
-                    "observacao": observacao,
-                    "evidencia1": evidencia1
-                }).execute()
+        if submit:
+            supabase.table("cobrancas").insert({
+                "boleto": boleto,
+                "seu_numero": seu_numero,
+                "pagador": pagador,
+                "valor_do_titulo": valor_titulo,
+                "valor_cobrado": valor_cobrado,
+                "vencimento": str(vencimento),
+                "data_da_liquidacao": str(data_pagamento),
+                "oscilacao": oscilacao,
+                "lote": lote,
+                "observacao": observacao,
+                "evidencia1": evidencia1
+            }).execute()
 
-                st.success("Registro inserido!")
+            st.success("Registro inserido!")
 
     # =============================
     # IMPORTAR EXCEL
