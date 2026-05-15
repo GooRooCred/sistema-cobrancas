@@ -362,41 +362,41 @@ elif menu == "Inserir":
 
         if submit:
 
-    try:
-
-        supabase.table("cobrancas").insert({
-
-            "boleto": boleto,
-            "seu_numero": seu_numero,
-            "pagador": pagador,
-
-            "valor_do_titulo": valor_titulo,
-            "valor_cobrado": valor_cobrado,
-
-            "vencimento": str(vencimento),
-            "data_da_liquidacao": str(data_pagamento),
-
-            "oscilacao": oscilacao,
-            "lote": lote,
-
-            "observacao": observacao,
-            "evidencia1": evidencia1
-
-        }).execute()
-
-        st.success("✅ Registro inserido com sucesso!")
-
-    except Exception as e:
-
-        erro = str(e)
-
-        if "duplicate key" in erro or "unique_boleto" in erro:
-
-            st.warning("⚠️ Boleto já existe na base de dados!")
-
-        else:
-
-            st.error(f"Erro ao inserir: {erro}")
+            try:
+        
+                supabase.table("cobrancas").insert({
+        
+                    "boleto": boleto,
+                    "seu_numero": seu_numero,
+                    "pagador": pagador,
+        
+                    "valor_do_titulo": valor_titulo,
+                    "valor_cobrado": valor_cobrado,
+        
+                    "vencimento": str(vencimento),
+                    "data_da_liquidacao": str(data_pagamento),
+        
+                    "oscilacao": oscilacao,
+                    "lote": lote,
+        
+                    "observacao": observacao,
+                    "evidencia1": evidencia1
+        
+                }).execute()
+        
+                st.success("✅ Registro inserido com sucesso!")
+        
+            except Exception as e:
+        
+                erro = str(e)
+        
+                if "duplicate key" in erro or "unique_boleto" in erro:
+        
+                    st.warning("⚠️ Boleto já existe na base de dados!")
+        
+                else:
+        
+                    st.error(f"Erro ao inserir: {erro}")
 
     # =============================
     # IMPORTAR EXCEL
