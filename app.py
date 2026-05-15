@@ -328,15 +328,15 @@ elif menu == "Inserir":
             else:
                 st.success("✅ Arquivo válido!")
 
-                ===================================
+                #===================================
                 # 🔥 MOSTRAR DADOS (PREVIEW)
-                ===================================
+                #===================================
                 st.write("📊 Prévia dos dados importados:")
                 st.dataframe(df.head(20), use_container_width=True)
                 
-                =========================
+                #=========================
                 # SOMA VALOR COBRADO
-                =========================
+                #=========================
                 total_valor_cobrado = 0
                 
                 if "valor_cobrado" in df.columns:
