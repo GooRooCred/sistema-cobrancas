@@ -512,7 +512,7 @@ elif menu == "Inserir":
                                 lote,
                                 on_conflict="boleto"
                             ).execute()
-                    
+                        
                         except Exception as e:
                             st.error(f"Erro ao importar lote: {e}")
                             st.stop()
