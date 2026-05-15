@@ -144,7 +144,7 @@ if menu_anterior != menu:
 
 st.session_state["menu_anterior"] = menu
 
-if st.sidebar.button("🚪 Logout"):
+if st.sidebar.button("Logout"):
     st.session_state["logado"] = False
     st.rerun()
     
