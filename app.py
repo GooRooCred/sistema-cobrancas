@@ -190,26 +190,33 @@ if menu == "Dashboard":
     # =============================
     # TOTAL GERAL
     # =============================
-    res_total = supabase.table("cobrancas") \
-        .select("*") \
+    # =============================
+    # TOTAL REGISTROS
+    # =============================
+    res_count = supabase.table("cobrancas") \
+        .select("*", count="exact") \
+        .limit(1) \
         .execute()
+    
+    total_registros = res_count.count or 0
 
-    df_total = pd.DataFrame(res_total.data)
-
-    total_registros = len(df_total)
-
-    valor_total_geral = 0
-    oscilacao_total_geral = 0
-
-    if not df_total.empty:
-
-        if "valor_cobrado" in df_total.columns:
-            valor_total_geral = df_total["valor_cobrado"] \
-                .apply(to_float).sum()
-
-        if "oscilacao" in df_total.columns:
-            oscilacao_total_geral = df_total["oscilacao"] \
-                .apply(to_float).sum()
+    # =============================
+    # VALOR TOTAL
+    # =============================
+    res_total = supabase.rpc(
+        "total_valor_cobrado"
+    ).execute()
+    
+    valor_total_geral = res_total.data or 0
+    
+    # =============================
+    # OSCILAÇÃO TOTAL
+    # =============================
+    res_osc = supabase.rpc(
+        "total_oscilacao"
+    ).execute()
+    
+    oscilacao_total_geral = res_osc.data or 0
 
     # =============================
     # MÉTRICAS GERAIS
