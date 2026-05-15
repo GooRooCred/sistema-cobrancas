@@ -327,8 +327,23 @@ elif menu == "Inserir":
                 st.error(f"❌ Colunas obrigatórias faltando: {colunas_faltando}")
             else:
                 st.success("✅ Arquivo válido!")
+
+                ===================================
+                # 🔥 MOSTRAR DADOS (PREVIEW)
+                ===================================
+                st.write("📊 Prévia dos dados importados:")
                 st.dataframe(df.head(20), use_container_width=True)
+                
+                =========================
+                # SOMA VALOR COBRADO
+                =========================
+                total_valor_cobrado = 0
+                
+                if "valor_cobrado" in df.columns:
+                    total_valor_cobrado = df["valor_cobrado"].apply(to_float).sum()
+                    
                 st.write(f"📌 Total de linhas: {len(df)}")
+                st.write(f"💰 Total Valor Cobrado: R$ {format_brl(total_valor_cobrado)}")
 
                 df = df.replace({np.nan: None})
 
