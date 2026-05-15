@@ -56,7 +56,7 @@ COLUNAS_AMIGAVEIS = {
 # FUNÇÃO DATA BR
 #================================
 def format_data_br(valor):
-    try:
+    :
         if pd.isna(valor):
             return ""
 
@@ -284,7 +284,7 @@ elif menu == "Consulta":
                 # datas
                 if chave in ["vencimento", "data_da_liquidacao"]:
     
-                    try:
+                    :
                         valor = pd.to_datetime(valor).strftime("%d/%m/%Y")
                     except:
                         pass
@@ -508,7 +508,10 @@ elif menu == "Inserir":
                         lote = dados[i:i+batch_size]
                     
                         try:
-                            supabase.table("cobrancas").insert(lote).execute()
+                            supabase.table("cobrancas").upsert(
+                                lote,
+                                on_conflict="boleto"
+                            ).execute()
                     
                         except Exception as e:
                             st.error(f"Erro ao importar lote: {e}")
