@@ -455,12 +455,14 @@ elif menu == "Editar":
         
         novo_boleto = col1.text_input(
             "BOLETO",
-            value=r.get("boleto", "")
+            value=r.get("boleto", ""),
+            disabled=True
         )
         
         novo_seu_numero = col2.text_input(
             "SEU NUMERO",
-            value=r.get("seu_numero", "")
+            value=r.get("seu_numero", ""),
+            disabled=True
         )
         
         novo_pagador = st.text_input(
