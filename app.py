@@ -56,12 +56,14 @@ COLUNAS_AMIGAVEIS = {
 # FUNÇÃO DATA BR
 #================================
 def format_data_br(valor):
-            return ""
+
     try:
-        
+
         if pd.isna(valor):
-           
+            return ""
+
         return pd.to_datetime(valor).strftime("%d/%m/%Y")
+
     except:
         return valor
 
