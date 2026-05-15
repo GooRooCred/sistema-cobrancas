@@ -178,9 +178,6 @@ if menu == "Dashboard":
 # =============================
 # CONSULTA
 # =============================
-# =============================
-# CONSULTA
-# =============================
 elif menu == "Consulta":
 
     st.title("🔎 Consulta")
@@ -205,13 +202,16 @@ elif menu == "Consulta":
     # =============================
     # QUERY
     # =============================
-    query = supabase.table("cobrancas").select("*")
+    query = supabase.table("cobrancas").select(
+        "seu_numero, boleto, vencimento, data_da_liquidacao, "
+        "valor_do_titulo, valor_cobrado, oscilacao, pagador, "
+        "lote, boleto_manual, checagem, observacao, evidencia1"
+    )
 
     if buscar and filtro:
         query = query.ilike("boleto", f"%{filtro}%")
 
     res = query.limit(200).execute()
-
     df = pd.DataFrame(res.data)
 
     # =============================
