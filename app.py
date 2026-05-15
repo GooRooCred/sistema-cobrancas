@@ -461,13 +461,62 @@ elif menu == "Editar":
 # EXCLUIR
 # =============================
 elif menu == "Excluir":
+
     st.title("❌ Excluir")
 
-    boleto = st.text_input("Boleto")
+    boleto = st.text_input("Digite o boleto")
 
-    if st.button("Excluir"):
-        supabase.table("cobrancas").delete().eq("boleto", boleto).execute()
-        st.warning("Excluído!")
+    # =========================
+    # BUSCAR REGISTRO
+    # =========================
+    if st.button("Buscar") and boleto:
+
+        res = supabase.table("cobrancas") \
+            .select("*") \
+            .eq("boleto", boleto) \
+            .execute()
+
+        if res.data:
+
+            st.session_state["registro_excluir"] = res.data[0]
+
+        else:
+            st.warning("Boleto não encontrado")
+
+    # =========================
+    # MOSTRAR DADOS
+    # =========================
+    if "registro_excluir" in st.session_state:
+
+        r = st.session_state["registro_excluir"]
+
+        st.markdown("### ⚠️ Confirme os dados antes de excluir")
+
+        col1, col2 = st.columns(2)
+
+        col1.write(f"**BOLETO:** {r.get('boleto', '')}")
+        col1.write(f"**CLIENTE:** {r.get('pagador', '')}")
+
+        col2.write(f"**SEU NÚMERO:** {r.get('seu_numero', '')}")
+        col2.write(
+            f"**VALOR:** R$ {format_brl(r.get('valor_cobrado', 0))}"
+        )
+
+        st.markdown("---")
+
+        # =========================
+        # CONFIRMAR EXCLUSÃO
+        # =========================
+        if st.button("🗑 Confirmar Exclusão"):
+
+            supabase.table("cobrancas") \
+                .delete() \
+                .eq("boleto", r.get("boleto")) \
+                .execute()
+
+            del st.session_state["registro_excluir"]
+
+            st.success("Registro excluído com sucesso!")
 
 # =============================
 # HISTÓRICO
