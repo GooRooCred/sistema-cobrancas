@@ -45,7 +45,7 @@ COLUNAS_AMIGAVEIS = {
     "valor_do_titulo": "R$ TITULO",
     "valor_cobrado": "R$ COBRADO",
     "oscilacao": "OSCILAÇÃO",
-    "pagador": "CLIENTE",
+    "pagador": "CLIENTE/PAGADOR",
     "lote": "LOTE",
     "boleto_manual": "BOLETO MANUAL",
     "checagem": "VALIDAÇÃO",
