@@ -388,8 +388,14 @@ elif menu == "Inserir":
 
                     for i in range(0, total, batch_size):
                         lote = dados[i:i+batch_size]
-                        supabase.table("cobrancas").insert(lote).execute()
-
+                    
+                        try:
+                            supabase.table("cobrancas").insert(lote).execute()
+                    
+                        except Exception as e:
+                            st.error(f"Erro ao importar lote: {e}")
+                            st.stop()
+                    
                         progresso.progress(min((i + batch_size) / total, 1.0))
                         status.text(f"Enviando {i + len(lote)} de {total}")
 
