@@ -342,8 +342,34 @@ elif menu == "Inserir":
                 if "valor_cobrado" in df.columns:
                     total_valor_cobrado = df["valor_cobrado"].apply(to_float).sum()
                     
-                st.write(f"📌 Total de linhas: {len(df)}")
-                st.write(f"💰 Total Valor Cobrado: R$ {format_brl(total_valor_cobrado)}")
+                #======================
+                # SOMA OSCILAÇÃO
+                #======================
+                total_oscilacao = 0
+                
+                if "oscilacao" in df.columns:
+                    total_oscilacao = df["oscilacao"].apply(to_float).sum()
+                
+                    
+                # =============================
+                # MÉTRICAS
+                # =============================
+                col1, col2, col3 = st.columns(3)
+                
+                col1.metric(
+                    "Total de Linhas",
+                    len(df)
+                )
+                
+                col2.metric(
+                    "Valor Cobrado",
+                    f"R$ {format_brl(total_valor_cobrado)}"
+                )
+                
+                col3.metric(
+                    "Oscilação",
+                    f"R$ {format_brl(total_oscilacao)}"
+                )
 
                 df = df.replace({np.nan: None})
 
