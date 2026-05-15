@@ -222,7 +222,7 @@ elif menu == "Inserir":
     # MANUAL
     # =============================
     if aba == "Manual":
-        with st.form("form_insert"):
+        with st.form:
             col1, col2 = st.columns(2)
 
             boleto = col1.text_input("BOLETO")
@@ -264,7 +264,7 @@ elif menu == "Inserir":
             observacao = st.text_area("OBSERVAÇÃO")
             evidencia1 = st.text_input("EVIDÊNCIA")
             
-            submit = st.form_submit_button("Salvar")
+            submit = st.button("Salvar")
 
             if submit:
                 supabase.table("cobrancas").insert({
