@@ -188,13 +188,18 @@ elif menu == "Consulta":
     # =============================
     # BUSCA
     # =============================
-    col1, col2 = st.columns([4,1])
+    col1, col2 = st.columns([3,1])
 
     filtro = col1.text_input(
         "Buscar boleto"
     )
 
-    buscar = col2.button("Buscar")
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    buscar = col2.button(
+        "Buscar",
+        use_container_width=True
+    )
 
     # =============================
     # QUERY
@@ -254,32 +259,35 @@ elif menu == "Consulta":
     )
 
     # =============================
-    # DETALHES DOS REGISTROS
+    # DETALHES SOMENTE DA PESQUISA
     # =============================
-    st.markdown("---")
-    st.subheader("👁 Detalhes")
-
-    for registro in res.data:
-
-        titulo = f"{registro.get('boleto', '')} - {registro.get('pagador', '')}"
-
-        with st.expander(titulo):
-
+    if buscar and filtro and res.data:
+    
+        registro = res.data[0]
+    
+        st.markdown("---")
+        st.subheader("👁 Detalhes do Registro")
+    
+        with st.expander(
+            f"{registro.get('boleto', '')} - {registro.get('pagador', '')}",
+            expanded=True
+        ):
+    
             for chave, valor in registro.items():
-
+    
                 nome_coluna = COLUNAS_AMIGAVEIS.get(
                     chave,
                     chave.upper()
                 )
-
+    
                 # datas
                 if chave in ["vencimento", "data_da_liquidacao"]:
-
+    
                     try:
                         valor = pd.to_datetime(valor).strftime("%d/%m/%Y")
                     except:
                         pass
-
+    
                 # valores monetários
                 if chave in [
                     "valor_do_titulo",
@@ -287,23 +295,23 @@ elif menu == "Consulta":
                     "oscilacao",
                     "boleto_manual"
                 ]:
+    
                     valor = f"R$ {format_brl(valor)}"
-
+    
                 st.write(f"**{nome_coluna}:** {valor}")
-
-    # =========================
-    # FORMATAR VALORES
-    # =========================
-    valor_cols = [
-        "valor_do_titulo",
-        "oscilacao",
-        "boleto_manual",
-        "valor_cobrado"
-    ]
-
-    for col in valor_cols:
-        if col in df.columns:
-            df[col] = df[col].apply(format_brl)
+        # =========================
+        # FORMATAR VALORES
+        # =========================
+        valor_cols = [
+            "valor_do_titulo",
+            "oscilacao",
+            "boleto_manual",
+            "valor_cobrado"
+        ]
+    
+        for col in valor_cols:
+            if col in df.columns:
+                df[col] = df[col].apply(format_brl)
 
     # =========================
     # FORMATAR DATAS
