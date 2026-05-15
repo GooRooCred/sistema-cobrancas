@@ -306,26 +306,6 @@ if menu == "Dashboard":
 
     oscilacao_formatada = f"R$ {format_brl(total_oscilacao)}"
 
-    # =============================
-    # MÉTRICAS
-    # =============================
-    col1, col2, col3 = st.columns(3)
-
-    col1.metric(
-        "📄 Total Boletos",
-        total_boletos
-    )
-
-    col2.metric(
-        "💰 Valor Cobrado",
-        valor_formatado
-    )
-
-    col3.metric(
-        "📈 Oscilação",
-        oscilacao_formatada
-    )
-
 # =============================
 # CONSULTA
 # =============================
