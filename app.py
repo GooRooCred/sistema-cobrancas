@@ -300,36 +300,6 @@ elif menu == "Consulta":
                     valor = f"R$ {format_brl(valor)}"
     
                 st.write(f"**{nome_coluna}:** {valor}")
-        # =========================
-        # FORMATAR VALORES
-        # =========================
-        valor_cols = [
-            "valor_do_titulo",
-            "oscilacao",
-            "boleto_manual",
-            "valor_cobrado"
-        ]
-    
-        for col in valor_cols:
-            if col in df.columns:
-                df[col] = df[col].apply(format_brl)
-
-    # =========================
-    # FORMATAR DATAS
-    # =========================
-    data_cols = [
-        "vencimento",
-        "data_da_liquidacao"
-    ]
-
-    for col in data_cols:
-        if col in df.columns:
-            df[col] = df[col].apply(format_data_br)
-            
-    df = df.rename(columns=COLUNAS_AMIGAVEIS)
-
-    st.dataframe(df, use_container_width=True)
-
 # =============================
 # INSERIR
 # =============================
