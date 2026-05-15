@@ -112,14 +112,40 @@ if not st.session_state["logado"]:
 # =============================
 st.markdown("""
 <style>
+
 .main {
     background-color: #f5f7fa;
 }
+
+/* BOTÕES */
 .stButton>button {
-    border-radius: 8px;
+    border-radius: 10px;
     background-color: #4CAF50;
     color: white;
+    font-weight: bold;
+    height: 42px;
 }
+
+/* MÉTRICAS */
+[data-testid="stMetric"] {
+    background-color: white;
+    border: 1px solid #EAEAEA;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+[data-testid="stMetricLabel"] {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+[data-testid="stMetricValue"] {
+    font-size: 34px;
+    font-weight: bold;
+    color: #111;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -158,25 +184,75 @@ st.sidebar.caption("Sistema de Cobranças v1.0")
 # DASHBOARD
 # =============================
 if menu == "Dashboard":
+
     st.title("📊 Dashboard")
 
-    res_count = supabase.table("cobrancas").select("*", count="exact").limit(1).execute()
-    total = res_count.count or 0
+    # =============================
+    # FILTRO DATA
+    # =============================
+    col_f1, col_f2 = st.columns(2)
 
-    res_total = supabase.rpc("total_valor_cobrado").execute()
-    valor_total = res_total.data or 0
+    data_inicio = col_f1.date_input(
+        "Data Inicial"
+    )
 
-    res_osc = supabase.rpc("total_oscilacao").execute()
-    total_oscilacao = res_osc.data or 0
+    data_fim = col_f2.date_input(
+        "Data Final"
+    )
 
-    valor_formatado = f"R$ {format_brl(valor_total)}"
+    # =============================
+    # QUERY
+    # =============================
+    res = supabase.table("cobrancas") \
+        .select("*") \
+        .gte("data_da_liquidacao", str(data_inicio)) \
+        .lte("data_da_liquidacao", str(data_fim)) \
+        .execute()
+
+    df_dash = pd.DataFrame(res.data)
+
+    # =============================
+    # TOTAIS
+    # =============================
+    total_boletos = len(df_dash)
+
+    total_valor = 0
+    total_oscilacao = 0
+
+    if not df_dash.empty:
+
+        if "valor_cobrado" in df_dash.columns:
+            total_valor = df_dash["valor_cobrado"].apply(to_float).sum()
+
+        if "oscilacao" in df_dash.columns:
+            total_oscilacao = df_dash["oscilacao"].apply(to_float).sum()
+
+    # =============================
+    # FORMATAÇÃO
+    # =============================
+    valor_formatado = f"R$ {format_brl(total_valor)}"
+
     oscilacao_formatada = f"R$ {format_brl(total_oscilacao)}"
 
+    # =============================
+    # MÉTRICAS
+    # =============================
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("Total de Registros", total)
-    col2.metric("Valor Total", valor_formatado)
-    col3.metric("Total Oscilação", oscilacao_formatada)
+    col1.metric(
+        "📄 Total Boletos",
+        total_boletos
+    )
+
+    col2.metric(
+        "💰 Valor Cobrado",
+        valor_formatado
+    )
+
+    col3.metric(
+        "📈 Oscilação",
+        oscilacao_formatada
+    )
 
 # =============================
 # CONSULTA
