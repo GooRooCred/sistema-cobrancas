@@ -128,6 +128,22 @@ menu = st.sidebar.radio(
     ["Dashboard", "Consulta", "Inserir", "Editar", "Excluir", "Histórico"]
 )
 
+# =============================
+# CONTROLE DE TROCA DE MENU
+# =============================
+menu_anterior = st.session_state.get("menu_anterior")
+
+if menu_anterior != menu:
+
+    # limpa edição anterior
+    if "registro" in st.session_state:
+        del st.session_state["registro"]
+
+    if "boleto_edit" in st.session_state:
+        del st.session_state["boleto_edit"]
+
+st.session_state["menu_anterior"] = menu
+
 if st.sidebar.button("🚪 Logout"):
     st.session_state["logado"] = False
     st.rerun()
