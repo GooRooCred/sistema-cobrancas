@@ -178,22 +178,118 @@ if menu == "Dashboard":
 # =============================
 # CONSULTA
 # =============================
+# =============================
+# CONSULTA
+# =============================
 elif menu == "Consulta":
+
     st.title("🔎 Consulta")
 
-    filtro = st.text_input("Buscar por boleto ou pagador")
+    # =============================
+    # BUSCA
+    # =============================
+    col1, col2 = st.columns([4,1])
 
-    query = supabase.table("cobrancas").select("""
-        seu_numero, boleto, vencimento, data_da_liquidacao,
-        valor_do_titulo, valor_cobrado, oscilacao, pagador,
-        lote, boleto_manual, checagem, observacao, evidencia1
-    """)
+    filtro = col1.text_input(
+        "Buscar boleto"
+    )
 
-    if filtro:
+    buscar = col2.button("Buscar")
+
+    # =============================
+    # QUERY
+    # =============================
+    query = supabase.table("cobrancas").select("*")
+
+    if buscar and filtro:
         query = query.ilike("boleto", f"%{filtro}%")
 
     res = query.limit(200).execute()
+
     df = pd.DataFrame(res.data)
+
+    # =============================
+    # FORMATA DATAS
+    # =============================
+    data_cols = [
+        "vencimento",
+        "data_da_liquidacao"
+    ]
+
+    for col in data_cols:
+
+        if col in df.columns:
+
+            df[col] = pd.to_datetime(
+                df[col],
+                errors="coerce"
+            ).dt.strftime("%d/%m/%Y")
+
+    # =============================
+    # FORMATA VALORES
+    # =============================
+    valor_cols = [
+        "valor_do_titulo",
+        "oscilacao",
+        "boleto_manual",
+        "valor_cobrado"
+    ]
+
+    for col in valor_cols:
+
+        if col in df.columns:
+            df[col] = df[col].apply(format_brl)
+
+    # =============================
+    # RENOMEIA COLUNAS
+    # =============================
+    df = df.rename(columns=COLUNAS_AMIGAVEIS)
+
+    # =============================
+    # MOSTRAR RESULTADOS
+    # =============================
+    st.dataframe(
+        df,
+        use_container_width=True
+    )
+
+    # =============================
+    # DETALHES DOS REGISTROS
+    # =============================
+    st.markdown("---")
+    st.subheader("👁 Detalhes")
+
+    for registro in res.data:
+
+        titulo = f"{registro.get('boleto', '')} - {registro.get('pagador', '')}"
+
+        with st.expander(titulo):
+
+            for chave, valor in registro.items():
+
+                nome_coluna = COLUNAS_AMIGAVEIS.get(
+                    chave,
+                    chave.upper()
+                )
+
+                # datas
+                if chave in ["vencimento", "data_da_liquidacao"]:
+
+                    try:
+                        valor = pd.to_datetime(valor).strftime("%d/%m/%Y")
+                    except:
+                        pass
+
+                # valores monetários
+                if chave in [
+                    "valor_do_titulo",
+                    "valor_cobrado",
+                    "oscilacao",
+                    "boleto_manual"
+                ]:
+                    valor = f"R$ {format_brl(valor)}"
+
+                st.write(f"**{nome_coluna}:** {valor}")
 
     # =========================
     # FORMATAR VALORES
