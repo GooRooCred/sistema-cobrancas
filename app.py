@@ -288,7 +288,7 @@ if menu == "Dashboard":
     # =============================
     # MÉTRICAS FILTRADAS
     # =============================
-    st.subheader("📊 Resultado do Período")
+    st.subheader("📊 Resultado do Período TOTAL")
 
     col4, col5, col6 = st.columns(3)
 
