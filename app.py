@@ -443,16 +443,24 @@ elif menu == "Consulta":
     # =============================
     # BUSCA
     # =============================
-    col1, col2 = st.columns(
-        [4,1],
+    col1, col2, col3, col4 = st.columns(
+        [3,3,2,1],
         vertical_alignment="bottom"
     )
     
-    filtro = col1.text_input(
+    filtro_boleto = col1.text_input(
         "Buscar boleto"
     )
     
-    buscar = col2.button(
+    filtro_pagador = col2.text_input(
+        "Cliente/Pagador"
+    )
+    
+    filtro_valor = col3.text_input(
+        "Valor Título"
+    )
+    
+    buscar = col4.button(
         "Buscar",
         use_container_width=True
     )
@@ -466,12 +474,43 @@ elif menu == "Consulta":
         "lote, boleto_manual, checagem, observacao, evidencia1"
     )
 
-    if buscar and filtro:
-        query = query.ilike("boleto", f"%{filtro}%")
+    if buscar:
 
-    res = query.limit(200).execute()
-    df = pd.DataFrame(res.data)
+    # =========================
+    # BOLETO
+    # =========================
+    if filtro_boleto:
+        query = query.ilike(
+            "boleto",
+            f"%{filtro_boleto}%"
+        )
 
+    # =========================
+    # PAGADOR
+    # =========================
+    if filtro_pagador:
+        query = query.ilike(
+            "pagador",
+            f"%{filtro_pagador}%"
+        )
+
+    # =========================
+    # VALOR TÍTULO
+    # =========================
+    if filtro_valor:
+
+        valor_busca = to_float(
+            filtro_valor
+        )
+
+        query = query.eq(
+            "valor_do_titulo",
+            valor_busca
+        )
+
+res = query.limit(200).execute()
+
+df = pd.DataFrame(res.data)
     # =============================
     # FORMATA DATAS
     # =============================
