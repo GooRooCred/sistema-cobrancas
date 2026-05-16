@@ -564,7 +564,7 @@ elif menu == "Consulta":
     # =============================
     # DETALHES SOMENTE DA PESQUISA
     # =============================
-    if buscar and filtro and res.data:
+    if buscar and res.data:
     
         registro = res.data[0]
     
