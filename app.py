@@ -308,124 +308,129 @@ if menu == "Dashboard":
     )
 
     # =============================
-    # BOLETOS BANCÁRIOS
+    # VALIDAÇÃO
     # =============================
-    df_boletos = df_dash[
-        (df_dash["boleto"].notna()) &
-        (df_dash["boleto"] != "") &
-        (df_dash["seu_numero"].notna()) &
-        (df_dash["seu_numero"] != "")
-    ]
+    if not df_dash.empty and "boleto" in df_dash.columns:
     
-    st.markdown("---")
-    st.subheader("🏦 Boletos Bancários")
+        # =============================
+        # BOLETOS BANCÁRIOS
+        # =============================
+        df_boletos = df_dash[
+            (df_dash["boleto"].notna()) &
+            (df_dash["boleto"] != "") &
+            (df_dash["seu_numero"].notna()) &
+            (df_dash["seu_numero"] != "")
+        ]
     
-    # =============================
-    # TOTAIS BOLETOS
-    # =============================
-    qtd_boletos = len(df_boletos)
+        st.markdown("---")
+        st.subheader("🏦 Boletos Bancários")
     
-    valor_boletos = 0
-    oscilacao_boletos = 0
+        # =============================
+        # TOTAIS BOLETOS
+        # =============================
+        qtd_boletos = len(df_boletos)
     
-    if not df_boletos.empty:
+        valor_boletos = 0
+        oscilacao_boletos = 0
     
-        if "valor_cobrado" in df_boletos.columns:
-            valor_boletos = df_boletos["valor_cobrado"] \
-                .apply(to_float).sum()
+        if not df_boletos.empty:
     
-        if "oscilacao" in df_boletos.columns:
-            oscilacao_boletos = df_boletos["oscilacao"] \
-                .apply(to_float).sum()
+            if "valor_cobrado" in df_boletos.columns:
+                valor_boletos = df_boletos["valor_cobrado"] \
+                    .apply(to_float).sum()
     
-    col_b1, col_b2, col_b3 = st.columns(3)
+            if "oscilacao" in df_boletos.columns:
+                oscilacao_boletos = df_boletos["oscilacao"] \
+                    .apply(to_float).sum()
     
-    col_b1.metric(
-        "Quantidade",
-        qtd_boletos
-    )
+        col_b1, col_b2, col_b3 = st.columns(3)
     
-    col_b2.metric(
-        "Valor Total",
-        f"R$ {format_brl(valor_boletos)}"
-    )
-    
-    col_b3.metric(
-        "Oscilação",
-        f"R$ {format_brl(oscilacao_boletos)}"
-    )
-    
-    # =============================
-    # MOVIMENTAÇÕES OPERACIONAIS
-    # =============================
-    df_operacional = df_dash[
-        (df_dash["boleto"].isna()) |
-        (df_dash["boleto"] == "") |
-        (df_dash["seu_numero"].isna()) |
-        (df_dash["seu_numero"] == "")
-    ]
-    
-    st.markdown("---")
-    st.subheader("🔄 Movimentações Operacionais")
-    
-    # =============================
-    # TOTAIS OPERACIONAIS
-    # =============================
-    qtd_operacional = len(df_operacional)
-    
-    valor_operacional = 0
-    oscilacao_operacional = 0
-    
-    if not df_operacional.empty:
-    
-        if "valor_cobrado" in df_operacional.columns:
-            valor_operacional = df_operacional["valor_cobrado"] \
-                .apply(to_float).sum()
-    
-        if "oscilacao" in df_operacional.columns:
-            oscilacao_operacional = df_operacional["oscilacao"] \
-                .apply(to_float).sum()
-    
-    col_o1, col_o2, col_o3 = st.columns(3)
-    
-    col_o1.metric(
-        "Quantidade",
-        qtd_operacional
-    )
-    
-    col_o2.metric(
-        "Valor Total",
-        f"R$ {format_brl(valor_operacional)}"
-    )
-    
-    col_o3.metric(
-        "Oscilação",
-        f"R$ {format_brl(oscilacao_operacional)}"
-    )
-    
-    # =============================
-    # AGRUPAMENTO OPERACIONAL
-    # =============================
-    if not df_operacional.empty:
-    
-        agrupado = (
-            df_operacional.groupby("pagador")
-            .size()
-            .reset_index(name="quantidade")
-            .sort_values("quantidade", ascending=False)
+        col_b1.metric(
+            "Quantidade",
+            qtd_boletos
         )
     
-        st.markdown("### 📋 Detalhamento")
+        col_b2.metric(
+            "Valor Total",
+            f"R$ {format_brl(valor_boletos)}"
+        )
     
-        for _, row in agrupado.iterrows():
+        col_b3.metric(
+            "Oscilação",
+            f"R$ {format_brl(oscilacao_boletos)}"
+        )
     
-            st.write(
-                f"• {row['pagador']} "
-                f"({row['quantidade']} registros)"
+        # =============================
+        # MOVIMENTAÇÕES OPERACIONAIS
+        # =============================
+        df_operacional = df_dash[
+            (df_dash["boleto"].isna()) |
+            (df_dash["boleto"] == "") |
+            (df_dash["seu_numero"].isna()) |
+            (df_dash["seu_numero"] == "")
+        ]
+    
+        st.markdown("---")
+        st.subheader("🔄 Movimentações Operacionais")
+    
+        # =============================
+        # TOTAIS OPERACIONAIS
+        # =============================
+        qtd_operacional = len(df_operacional)
+    
+        valor_operacional = 0
+        oscilacao_operacional = 0
+    
+        if not df_operacional.empty:
+    
+            if "valor_cobrado" in df_operacional.columns:
+                valor_operacional = df_operacional["valor_cobrado"] \
+                    .apply(to_float).sum()
+    
+            if "oscilacao" in df_operacional.columns:
+                oscilacao_operacional = df_operacional["oscilacao"] \
+                    .apply(to_float).sum()
+    
+        col_o1, col_o2, col_o3 = st.columns(3)
+    
+        col_o1.metric(
+            "Quantidade",
+            qtd_operacional
+        )
+    
+        col_o2.metric(
+            "Valor Total",
+            f"R$ {format_brl(valor_operacional)}"
+        )
+    
+        col_o3.metric(
+            "Oscilação",
+            f"R$ {format_brl(oscilacao_operacional)}"
+        )
+    
+        # =============================
+        # AGRUPAMENTO OPERACIONAL
+        # =============================
+        if not df_operacional.empty:
+    
+            agrupado = (
+                df_operacional.groupby("pagador")
+                .size()
+                .reset_index(name="quantidade")
+                .sort_values("quantidade", ascending=False)
             )
     
+            st.markdown("### 📋 Detalhamento")
+    
+            for _, row in agrupado.iterrows():
+    
+                st.write(
+                    f"• {row['pagador']} "
+                    f"({row['quantidade']} registros)"
+                )
+    
     else:
-        st.info("Nenhuma movimentação operacional encontrada.")
+        st.info("Nenhum dado encontrado no período.")
     # =============================
     # FORMATAÇÃO
     # =============================
