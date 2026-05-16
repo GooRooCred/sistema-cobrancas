@@ -476,41 +476,41 @@ elif menu == "Consulta":
 
     if buscar:
 
-    # =========================
-    # BOLETO
-    # =========================
-    if filtro_boleto:
-        query = query.ilike(
-            "boleto",
-            f"%{filtro_boleto}%"
-        )
-
-    # =========================
-    # PAGADOR
-    # =========================
-    if filtro_pagador:
-        query = query.ilike(
-            "pagador",
-            f"%{filtro_pagador}%"
-        )
-
-    # =========================
-    # VALOR TÍTULO
-    # =========================
-    if filtro_valor:
-
-        valor_busca = to_float(
-            filtro_valor
-        )
-
-        query = query.eq(
-            "valor_do_titulo",
-            valor_busca
-        )
-
-res = query.limit(200).execute()
-
-df = pd.DataFrame(res.data)
+        # =========================
+        # BOLETO
+        # =========================
+        if filtro_boleto:
+            query = query.ilike(
+                "boleto",
+                f"%{filtro_boleto}%"
+            )
+    
+        # =========================
+        # PAGADOR
+        # =========================
+        if filtro_pagador:
+            query = query.ilike(
+                "pagador",
+                f"%{filtro_pagador}%"
+            )
+    
+        # =========================
+        # VALOR TÍTULO
+        # =========================
+        if filtro_valor:
+    
+            valor_busca = to_float(
+                filtro_valor
+            )
+    
+            query = query.eq(
+                "valor_do_titulo",
+                valor_busca
+            )
+    
+    res = query.limit(200).execute()
+    
+    df = pd.DataFrame(res.data)
     # =============================
     # FORMATA DATAS
     # =============================
