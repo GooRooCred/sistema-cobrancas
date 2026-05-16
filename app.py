@@ -306,6 +306,56 @@ if menu == "Dashboard":
         "📈 Oscilação Período",
         f"R$ {format_brl(total_oscilacao)}"
     )
+
+    # =============================
+    # BOLETOS BANCÁRIOS
+    # =============================
+    df_boletos = df_dash[
+        (df_dash["boleto"].notna()) &
+        (df_dash["boleto"] != "") &
+        (df_dash["seu_numero"].notna()) &
+        (df_dash["seu_numero"] != "")
+    ]
+    
+    st.markdown("---")
+    st.subheader("🏦 Boletos Bancários")
+    
+    st.write(
+        f"Quantidade de boletos bancários: "
+        f"**{len(df_boletos)}**"
+    )
+    
+    # =============================
+    # MOVIMENTAÇÕES OPERACIONAIS
+    # =============================
+    df_operacional = df_dash[
+        (df_dash["boleto"].isna()) |
+        (df_dash["boleto"] == "") |
+        (df_dash["seu_numero"].isna()) |
+        (df_dash["seu_numero"] == "")
+    ]
+    
+    st.markdown("---")
+    st.subheader("🔄 Movimentações Operacionais")
+    
+    if not df_operacional.empty:
+    
+        agrupado = (
+            df_operacional.groupby("pagador")
+            .size()
+            .reset_index(name="quantidade")
+            .sort_values("quantidade", ascending=False)
+        )
+    
+        for _, row in agrupado.iterrows():
+    
+            st.write(
+                f"• {row['pagador']} "
+                f"({row['quantidade']} registros)"
+            )
+    
+    else:
+        st.info("Nenhuma movimentação operacional encontrada.")
     # =============================
     # FORMATAÇÃO
     # =============================
