@@ -15,6 +15,7 @@ def format_brl(valor):
     except:
         return "0,00"
 
+
 # =============================
 # FORMAT FLOAT
 # =============================
@@ -37,7 +38,8 @@ def to_float(valor):
 
     except:
         return 0.0
-        
+
+
 COLUNAS_AMIGAVEIS = {
     "seu_numero": "SEU NUMERO",
     "boleto": "BOLETO",
@@ -53,9 +55,10 @@ COLUNAS_AMIGAVEIS = {
     "observacao": "OBSERVAÇÃO",
     "evidencia1": "EVIDÊNCIA"
 }
-#================================
+
+# ================================
 # FUNÇÃO DATA BR
-#================================
+# ================================
 def format_data_br(valor):
 
     try:
@@ -67,6 +70,7 @@ def format_data_br(valor):
 
     except:
         return valor
+
 
 # =============================
 # CONFIG
@@ -93,6 +97,7 @@ if not st.session_state["logado"]:
     st.title("🔒 Login")
 
     usuario = st.text_input("Usuário")
+
     senha = st.text_input(
         "Senha",
         type="password"
@@ -108,7 +113,7 @@ if not st.session_state["logado"]:
                 .eq("ativo", True)
                 .execute()
             )
-          
+
             if not res.data:
                 st.error("Usuário ou senha inválidos")
                 st.stop()
@@ -145,6 +150,7 @@ if not st.session_state["logado"]:
             )
 
     st.stop()
+
 # =============================
 # ESTILO
 # =============================
@@ -250,7 +256,7 @@ if st.sidebar.button("Logout"):
     st.session_state.clear()
 
     st.rerun()
-    
+
 st.sidebar.markdown("---")
 
 if "usuario" in st.session_state:
@@ -277,14 +283,13 @@ if menu == "Dashboard":
     # =============================
     # TOTAL GERAL
     # =============================
-    # =============================
-    # TOTAL REGISTROS
-    # =============================
-    res_count = supabase.table("cobrancas") \
-        .select("*", count="exact") \
-        .limit(1) \
+    res_count = (
+        supabase.table("cobrancas")
+        .select("*", count="exact")
+        .limit(1)
         .execute()
-    
+    )
+
     total_registros = res_count.count or 0
 
     # =============================
@@ -293,16 +298,16 @@ if menu == "Dashboard":
     res_total = supabase.rpc(
         "total_valor_cobrado"
     ).execute()
-    
+
     valor_total_geral = res_total.data or 0
-    
+
     # =============================
     # OSCILAÇÃO TOTAL
     # =============================
     res_osc = supabase.rpc(
         "total_oscilacao"
     ).execute()
-    
+
     oscilacao_total_geral = res_osc.data or 0
 
     # =============================
@@ -349,11 +354,13 @@ if menu == "Dashboard":
     # =============================
     # QUERY FILTRO
     # =============================
-    res = supabase.table("cobrancas") \
-        .select("*") \
-        .gte("data_da_liquidacao", str(data_inicio)) \
-        .lte("data_da_liquidacao", str(data_fim)) \
+    res = (
+        supabase.table("cobrancas")
+        .select("*")
+        .gte("data_da_liquidacao", str(data_inicio))
+        .lte("data_da_liquidacao", str(data_fim))
         .execute()
+    )
 
     df_dash = pd.DataFrame(res.data)
 
@@ -365,12 +372,18 @@ if menu == "Dashboard":
     if not df_dash.empty:
 
         if "valor_cobrado" in df_dash.columns:
-            total_valor = df_dash["valor_cobrado"] \
-                .apply(to_float).sum()
+            total_valor = (
+                df_dash["valor_cobrado"]
+                .apply(to_float)
+                .sum()
+            )
 
         if "oscilacao" in df_dash.columns:
-            total_oscilacao = df_dash["oscilacao"] \
-                .apply(to_float).sum()
+            total_oscilacao = (
+                df_dash["oscilacao"]
+                .apply(to_float)
+                .sum()
+            )
 
     # =============================
     # MÉTRICAS FILTRADAS
@@ -398,7 +411,7 @@ if menu == "Dashboard":
     # VALIDAÇÃO
     # =============================
     if not df_dash.empty and "boleto" in df_dash.columns:
-    
+
         # =============================
         # BOLETOS BANCÁRIOS
         # =============================
@@ -408,45 +421,48 @@ if menu == "Dashboard":
             (df_dash["seu_numero"].notna()) &
             (df_dash["seu_numero"] != "")
         ]
-    
+
         st.markdown("---")
         st.subheader("🏦 Boletos Bancários")
-    
-        # =============================
-        # TOTAIS BOLETOS
-        # =============================
+
         qtd_boletos = len(df_boletos)
-    
+
         valor_boletos = 0
         oscilacao_boletos = 0
-    
+
         if not df_boletos.empty:
-    
+
             if "valor_cobrado" in df_boletos.columns:
-                valor_boletos = df_boletos["valor_cobrado"] \
-                    .apply(to_float).sum()
-    
+                valor_boletos = (
+                    df_boletos["valor_cobrado"]
+                    .apply(to_float)
+                    .sum()
+                )
+
             if "oscilacao" in df_boletos.columns:
-                oscilacao_boletos = df_boletos["oscilacao"] \
-                    .apply(to_float).sum()
-    
+                oscilacao_boletos = (
+                    df_boletos["oscilacao"]
+                    .apply(to_float)
+                    .sum()
+                )
+
         col_b1, col_b2, col_b3 = st.columns(3)
-    
+
         col_b1.metric(
             "Quantidade",
             qtd_boletos
         )
-    
+
         col_b2.metric(
             "Valor Total",
             f"R$ {format_brl(valor_boletos)}"
         )
-    
+
         col_b3.metric(
             "Oscilação",
             f"R$ {format_brl(oscilacao_boletos)}"
         )
-    
+
         # =============================
         # MOVIMENTAÇÕES OPERACIONAIS
         # =============================
@@ -456,50 +472,53 @@ if menu == "Dashboard":
             (df_dash["seu_numero"].isna()) |
             (df_dash["seu_numero"] == "")
         ]
-    
+
         st.markdown("---")
         st.subheader("🔄 Movimentações Operacionais")
-    
-        # =============================
-        # TOTAIS OPERACIONAIS
-        # =============================
+
         qtd_operacional = len(df_operacional)
-    
+
         valor_operacional = 0
         oscilacao_operacional = 0
-    
+
         if not df_operacional.empty:
-    
+
             if "valor_cobrado" in df_operacional.columns:
-                valor_operacional = df_operacional["valor_cobrado"] \
-                    .apply(to_float).sum()
-    
+                valor_operacional = (
+                    df_operacional["valor_cobrado"]
+                    .apply(to_float)
+                    .sum()
+                )
+
             if "oscilacao" in df_operacional.columns:
-                oscilacao_operacional = df_operacional["oscilacao"] \
-                    .apply(to_float).sum()
-    
+                oscilacao_operacional = (
+                    df_operacional["oscilacao"]
+                    .apply(to_float)
+                    .sum()
+                )
+
         col_o1, col_o2, col_o3 = st.columns(3)
-    
+
         col_o1.metric(
             "Quantidade",
             qtd_operacional
         )
-    
+
         col_o2.metric(
             "Valor Total",
             f"R$ {format_brl(valor_operacional)}"
         )
-    
+
         col_o3.metric(
             "Oscilação",
             f"R$ {format_brl(oscilacao_operacional)}"
         )
-    
+
         # =============================
         # AGRUPAMENTO OPERACIONAL
         # =============================
         if not df_operacional.empty:
-        
+
             agrupado = (
                 df_operacional.groupby("pagador")
                 .agg(
@@ -509,19 +528,20 @@ if menu == "Dashboard":
                 .reset_index()
                 .sort_values("valor_total", ascending=False)
             )
-        
+
             st.markdown("### 📋 Detalhamento")
-        
+
             for _, row in agrupado.iterrows():
-        
+
                 st.write(
                     f"• {row['pagador']} "
                     f"({row['quantidade']} registros) "
                     f"- R$ {format_brl(row['valor_total'])}"
                 )
-        
+
     else:
         st.info("Nenhum dado encontrado no período.")
+
     # =============================
     # FORMATAÇÃO
     # =============================
