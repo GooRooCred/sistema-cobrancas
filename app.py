@@ -3,6 +3,7 @@ from supabase import create_client
 import pandas as pd
 import numpy as np
 import io
+import bcrypt
 
 # =============================
 # FORMAT BR
@@ -84,9 +85,6 @@ st.set_page_config(
 # =============================
 # LOGIN
 # =============================
-USUARIO = "gooroo"
-SENHA = "Admin@3256"
-
 if "logado" not in st.session_state:
     st.session_state["logado"] = False
 
@@ -95,16 +93,56 @@ if not st.session_state["logado"]:
     st.title("🔒 Login")
 
     usuario = st.text_input("Usuário")
-    senha = st.text_input("Senha", type="password")
+    senha = st.text_input(
+        "Senha",
+        type="password"
+    )
 
     if st.button("Entrar"):
 
-        if usuario == USUARIO and senha == SENHA:
-            st.session_state["logado"] = True
-            st.rerun()
+        try:
+            res = (
+                supabase.table("usuarios")
+                .select("*")
+                .eq("usuario", usuario)
+                .eq("ativo", True)
+                .execute()
+            )
 
-        else:
-            st.error("Usuário ou senha inválidos")
+            if not res.data:
+                st.error("Usuário ou senha inválidos")
+                st.stop()
+
+            user = res.data[0]
+
+            senha_ok = bcrypt.checkpw(
+                senha.encode(),
+                user["senha_hash"].encode()
+            )
+
+            if senha_ok:
+
+                st.session_state["logado"] = True
+
+                st.session_state["usuario"] = (
+                    user["usuario"]
+                )
+
+                st.session_state["perfil"] = (
+                    user["perfil"]
+                )
+
+                st.rerun()
+
+            else:
+                st.error(
+                    "Usuário ou senha inválidos"
+                )
+
+        except Exception as e:
+            st.error(
+                f"Erro no login: {e}"
+            )
 
     st.stop()
 # =============================
@@ -174,11 +212,24 @@ if menu_anterior != menu:
 st.session_state["menu_anterior"] = menu
 
 if st.sidebar.button("Logout"):
-    st.session_state["logado"] = False
+
+    st.session_state.clear()
+
     st.rerun()
     
 st.sidebar.markdown("---")
-st.sidebar.caption("Sistema de Cobranças v1.0")
+
+st.sidebar.write(
+    f"👤 {st.session_state['usuario']}"
+)
+
+st.sidebar.write(
+    f"🔐 Perfil: {st.session_state['perfil']}"
+)
+
+st.sidebar.caption(
+    "Sistema Base Geral Conciliação GooRoo v1.0"
+)
 
 # =============================
 # DASHBOARD
