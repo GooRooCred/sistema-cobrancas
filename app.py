@@ -308,11 +308,9 @@ menu_anterior = st.session_state.get("menu_anterior")
 if menu_anterior != menu:
 
     # limpa edição anterior
-    if "registro" in st.session_state:
-        del st.session_state["registro"]
-
-    if "boleto_edit" in st.session_state:
-        del st.session_state["boleto_edit"]
+    st.session_state.pop("registro", None)
+    st.session_state.pop("boleto_edit", None)
+    st.session_state.pop("registro_excluir", None)
 
 st.session_state["menu_anterior"] = menu
 
