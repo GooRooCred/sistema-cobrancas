@@ -1476,6 +1476,135 @@ elif menu == "Histórico":
 
     st.title("🕓 Histórico")
 
+    # =============================
+    # FILTROS
+    # =============================
+    col1, col2, col3 = st.columns(3)
+    
+    usuario_filtro = col1.text_input(
+        "Usuário"
+    )
+    
+    acao_filtro = col2.selectbox(
+        "Ação",
+        [
+            "Todas",
+            "INSERIR",
+            "EDITAR",
+            "EXCLUIR"
+        ]
+    )
+    
+    limite = col3.selectbox(
+        "Quantidade",
+        [
+            50,
+            100,
+            500,
+            1000
+        ],
+        index=1
+    )
+    
+    # =============================
+    # CONSULTA AUDITORIA
+    # =============================
+    query = (
+        supabase.table("auditoria")
+        .select("*")
+        .order(
+            "data_hora",
+            desc=True
+        )
+    )
+    
+    if usuario_filtro:
+    
+        query = query.ilike(
+            "usuario",
+            f"%{usuario_filtro}%"
+        )
+    
+    if acao_filtro != "Todas":
+    
+        query = query.eq(
+            "acao",
+            acao_filtro
+        )
+    
+    res = query.limit(
+        limite
+    ).execute()
+    
+    df_hist = pd.DataFrame(
+        res.data
+    )
+
+# =============================
+# FORMATAR
+# =============================
+if not df_hist.empty:
+
+    if "data_hora" in df_hist.columns:
+
+        df_hist[
+            "data_hora"
+        ] = pd.to_datetime(
+            df_hist[
+                "data_hora"
+            ]
+        ).dt.strftime(
+            "%d/%m/%Y %H:%M"
+        )
+
+    if "valor_anterior" in df_hist.columns:
+
+        df_hist[
+            "valor_anterior"
+        ] = df_hist[
+            "valor_anterior"
+        ].fillna(0).apply(
+            lambda x:
+            f"R$ {format_brl(x)}"
+        )
+
+    if "valor_novo" in df_hist.columns:
+
+        df_hist[
+            "valor_novo"
+        ] = df_hist[
+            "valor_novo"
+        ].fillna(0).apply(
+            lambda x:
+            f"R$ {format_brl(x)}"
+        )
+
+    mostrar = df_hist[
+        [
+            "data_hora",
+            "usuario",
+            "perfil",
+            "acao",
+            "boleto",
+            "pagador",
+            "valor_anterior",
+            "valor_novo",
+            "observacao"
+        ]
+    ]
+
+    st.dataframe(
+        mostrar,
+        use_container_width=True,
+        height=500
+    )
+
+else:
+
+    st.info(
+        "Nenhum histórico encontrado."
+    )
+
 # =============================
 # USUÁRIOS
 # =============================
