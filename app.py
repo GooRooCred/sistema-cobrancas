@@ -201,7 +201,7 @@ perfil = st.session_state.get(
     "leitura"
 )
 
-if perfil == "admin":
+if perfil == "superadmin":
 
     opcoes_menu = [
         "Dashboard",
@@ -211,6 +211,17 @@ if perfil == "admin":
         "Excluir",
         "Histórico",
         "Usuários"
+    ]
+
+elif perfil == "admin":
+
+    opcoes_menu = [
+        "Dashboard",
+        "Consulta",
+        "Inserir",
+        "Editar",
+        "Excluir",
+        "Histórico"
     ]
 
 elif perfil == "operador":
@@ -229,11 +240,6 @@ else:
         "Dashboard",
         "Consulta"
     ]
-
-menu = st.sidebar.radio(
-    "📌 Menu",
-    opcoes_menu
-)
 
 # =============================
 # CONTROLE DE TROCA DE MENU
@@ -1229,7 +1235,7 @@ elif menu == "Excluir":
     # =============================
     # PERMISSÃO
     # =============================
-    if st.session_state.get("perfil") != "admin":
+    if st.session_state.get("perfil") != "superadmin":
         st.error("⛔ Acesso negado")
         st.stop()
 
@@ -1328,7 +1334,7 @@ elif menu == "Usuários":
     # =============================
     # PERMISSÃO
     # =============================
-    if st.session_state.get("perfil") != "admin":
+    if st.session_state.get("perfil") != "superadmin":
         st.error("⛔ Acesso negado")
         st.stop()
 
