@@ -1094,27 +1094,27 @@ elif menu == "Editar":
     st.title("✏️ Editar")
 
     
-        # =========================
-        # CAMPOS
-        # =========================
-        col1, col2 = st.columns(2)
+    # =========================
+    # CAMPOS
+     # =========================
+    col1, col2 = st.columns(2)
 
-        novo_boleto = col1.text_input(
-            "BOLETO",
-            value=r.get("boleto", ""),
-            disabled=True
-        )
+    novo_boleto = col1.text_input(
+        "BOLETO",
+        value=r.get("boleto", ""),
+        disabled=True
+    )
 
-        novo_seu_numero = col2.text_input(
-            "SEU NUMERO",
-            value=r.get("seu_numero", ""),
-            disabled=True
-        )
+    novo_seu_numero = col2.text_input(
+        "SEU NUMERO",
+        value=r.get("seu_numero", ""),
+        disabled=True
+    )
 
-        novo_pagador = st.text_input(
-            "CLIENTE",
-            value=r.get("pagador", "")
-        )
+    novo_pagador = st.text_input(
+        "CLIENTE",
+        value=r.get("pagador", "")
+    )
 
         # =========================
         # VALORES
