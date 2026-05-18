@@ -1107,7 +1107,7 @@ elif menu == "Editar":
         )
     
         if res.data:
-            st.session_state["registro_excluir"] = res.data[0]
+            st.session_state["registro"] = res.data[0]
     
         else:
             st.warning("Boleto não encontrado")
