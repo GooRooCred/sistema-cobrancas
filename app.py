@@ -566,46 +566,64 @@ elif menu == "Consulta":
     )
 
     # =============================
-    # DETALHES SOMENTE DA PESQUISA
+    # DETALHES DA PESQUISA
     # =============================
     if buscar and res.data:
     
-        registro = res.data[0]
-    
         st.markdown("---")
-        st.subheader("👁 Detalhes do Registro")
+        st.subheader("👁 Detalhes dos Registros")
     
-        with st.expander(
-            f"{registro.get('boleto', '')} - {registro.get('pagador', '')}",
-            expanded=True
-        ):
+        for registro in res.data:
     
-            for chave, valor in registro.items():
+            titulo = (
+                f"{registro.get('boleto', 'Sem boleto')} - "
+                f"{registro.get('pagador', '')}"
+            )
     
-                nome_coluna = COLUNAS_AMIGAVEIS.get(
-                    chave,
-                    chave.upper()
-                )
+            with st.expander(
+                titulo,
+                expanded=False
+            ):
     
-                # datas
-                if chave in ["vencimento", "data_da_liquidacao"]:
+                for chave, valor in registro.items():
     
-                    try:
-                        valor = pd.to_datetime(valor).strftime("%d/%m/%Y")
-                    except:
-                        pass
+                    nome_coluna = COLUNAS_AMIGAVEIS.get(
+                        chave,
+                        chave.upper()
+                    )
     
-                # valores monetários
-                if chave in [
-                    "valor_do_titulo",
-                    "valor_cobrado",
-                    "oscilacao",
-                    "boleto_manual"
-                ]:
+                    # =========================
+                    # DATAS
+                    # =========================
+                    if chave in [
+                        "vencimento",
+                        "data_da_liquidacao"
+                    ]:
     
-                    valor = f"R$ {format_brl(valor)}"
+                        try:
+                            valor = pd.to_datetime(
+                                valor
+                            ).strftime("%d/%m/%Y")
+                        except:
+                            pass
     
-                st.write(f"**{nome_coluna}:** {valor}")
+                    # =========================
+                    # VALORES
+                    # =========================
+                    if chave in [
+                        "valor_do_titulo",
+                        "valor_cobrado",
+                        "oscilacao",
+                        "boleto_manual"
+                    ]:
+    
+                        valor = (
+                            f"R$ {format_brl(valor)}"
+                        )
+    
+                    st.write(
+                        f"**{nome_coluna}:** {valor}"
+                    )
 # =============================
 # INSERIR
 # =============================
