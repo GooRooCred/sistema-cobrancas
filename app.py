@@ -1104,7 +1104,7 @@ elif menu == "Editar":
     # =============================
     boleto_editar = st.text_input(
         "Digite o boleto para editar",
-        key="boleto_editar_input"
+        key="editar_boleto_input_v1"
     )
     
     if boleto_editar:
