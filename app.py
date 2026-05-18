@@ -1093,219 +1093,216 @@ elif menu == "Editar":
 
     st.title("✏️ Editar")
 
-    
-        # =========================
-        # CAMPOS
-        # =========================
-        col1, col2 = st.columns(2)
-    
-        novo_boleto = col1.text_input(
-            "BOLETO",
-            value=r.get("boleto", ""),
-            disabled=True
-        )
-    
-        novo_seu_numero = col2.text_input(
-            "SEU NUMERO",
-            value=r.get("seu_numero", ""),
-            disabled=True
-        )
-    
-        novo_pagador = st.text_input(
-            "CLIENTE",
-            value=r.get("pagador", "")
-        )
-    
-        # =========================
-        # VALORES
-        # =========================
-        col3, col4 = st.columns(2)
-    
-        novo_valor_titulo = col3.number_input(
-            "R$ TITULO",
-            value=float(
-                r.get("valor_do_titulo") or 0
-            ),
-            step=0.01
-        )
-    
-        novo_valor_cobrado = col4.number_input(
-            "R$ COBRADO",
-            value=float(
-                r.get("valor_cobrado") or 0
-            ),
-            step=0.01
-        )
-    
-        # =========================
-        # DATAS
-        # =========================
-        col5, col6 = st.columns(2)
-    
-        novo_vencimento = col5.date_input(
-            "VENCIMENTO",
-            value=pd.to_datetime(
-                r.get("vencimento")
-            ).date(),
-            format="DD/MM/YYYY"
-        )
-    
-        nova_data_pagamento = col6.date_input(
-            "DATA PAGAMENTO",
-            value=pd.to_datetime(
-                r.get("data_da_liquidacao")
-            ).date(),
-            format="DD/MM/YYYY"
-        )
-    
-        # =========================
-        # OSCILAÇÃO AUTOMÁTICA
-        # =========================
-        col7, col8 = st.columns(2)
-    
-        nova_oscilacao = (
-            novo_valor_cobrado
-            - novo_valor_titulo
-        )
-    
-        col7.text_input(
-            "OSCILAÇÃO",
-            value=format_brl(
-                nova_oscilacao
-            ),
-            disabled=True
-        )
-    
-        novo_lote = col8.text_input(
-            "LOTE",
-            value=r.get("lote", "")
-        )
-    
-        # =========================
-        # OBSERVAÇÕES
-        # =========================
-        nova_observacao = st.text_area(
-            "OBSERVAÇÃO",
-            value=r.get(
-                "observacao",
-                ""
-            )
-        )
-    
-        nova_evidencia = st.text_input(
-            "EVIDÊNCIA",
-            value=r.get(
-                "evidencia1",
-                ""
-            )
-        )
-    
-        # =========================
-        # SALVAR ALTERAÇÕES
-        # =========================
-        if st.button(
-            "Salvar alterações"
-        ):
-        
-            # histórico
-            (
-                supabase.table(
-                    "cobrancas_log"
-                )
-                .insert({
-                    "boleto": novo_boleto,
-                    "pagador": novo_pagador,
-                    "valor_cobrado":
-                        novo_valor_cobrado
-                })
-                .execute()
-            )
-        
-            # update
-            (
-                supabase.table(
-                    "cobrancas"
-                )
-                .update({
-        
-                    "boleto":
-                        novo_boleto,
-        
-                    "seu_numero":
-                        novo_seu_numero,
-        
-                    "pagador":
-                        novo_pagador,
-        
-                    "valor_do_titulo":
-                        novo_valor_titulo,
-        
-                    "valor_cobrado":
-                        novo_valor_cobrado,
-        
-                    "oscilacao":
-                        nova_oscilacao,
-        
-                    "vencimento":
-                        str(
-                            novo_vencimento
-                        ),
-        
-                    "data_da_liquidacao":
-                        str(
-                            nova_data_pagamento
-                        ),
-        
-                    "lote":
-                        novo_lote,
-        
-                    "observacao":
-                        nova_observacao,
-        
-                    "evidencia1":
-                        nova_evidencia
-        
-                })
-                .eq(
-                    "boleto",
-                    st.session_state[
-                        "boleto_edit"
-                    ]
-                )
-                .execute()
-            )
-        
-            # =========================
-            # LOG AUDITORIA
-            # =========================
-            registrar_log(
-                acao="EDITAR",
-        
-                boleto=novo_boleto,
-        
-                seu_numero=
-                    novo_seu_numero,
-        
-                pagador=
-                    novo_pagador,
-        
-                valor_anterior=
-                    r.get(
-                        "valor_cobrado"
-                    ),
-        
-                valor_novo=
-                    novo_valor_cobrado,
-        
-                observacao=
-                    "Registro editado"
-            )
-        
-            st.success(
-                "✅ Registro atualizado!"
-            )
+# =========================
+# CAMPOS
+# =========================
+col1, col2 = st.columns(2)
 
+novo_boleto = col1.text_input(
+    "BOLETO",
+    value=r.get("boleto", ""),
+    disabled=True
+)
 
+novo_seu_numero = col2.text_input(
+    "SEU NUMERO",
+    value=r.get("seu_numero", ""),
+    disabled=True
+)
+
+novo_pagador = st.text_input(
+    "CLIENTE",
+    value=r.get("pagador", "")
+)
+
+# =========================
+# VALORES
+# =========================
+col3, col4 = st.columns(2)
+
+novo_valor_titulo = col3.number_input(
+    "R$ TITULO",
+    value=float(
+        r.get("valor_do_titulo") or 0
+    ),
+    step=0.01
+)
+
+novo_valor_cobrado = col4.number_input(
+    "R$ COBRADO",
+    value=float(
+        r.get("valor_cobrado") or 0
+    ),
+    step=0.01
+)
+
+# =========================
+# DATAS
+# =========================
+col5, col6 = st.columns(2)
+
+novo_vencimento = col5.date_input(
+    "VENCIMENTO",
+    value=pd.to_datetime(
+        r.get("vencimento")
+    ).date(),
+    format="DD/MM/YYYY"
+)
+
+nova_data_pagamento = col6.date_input(
+    "DATA PAGAMENTO",
+    value=pd.to_datetime(
+        r.get("data_da_liquidacao")
+    ).date(),
+    format="DD/MM/YYYY"
+)
+
+# =========================
+# OSCILAÇÃO AUTOMÁTICA
+# =========================
+col7, col8 = st.columns(2)
+
+nova_oscilacao = (
+    novo_valor_cobrado
+    - novo_valor_titulo
+)
+
+col7.text_input(
+    "OSCILAÇÃO",
+    value=format_brl(
+        nova_oscilacao
+    ),
+    disabled=True
+)
+
+novo_lote = col8.text_input(
+    "LOTE",
+    value=r.get("lote", "")
+)
+
+# =========================
+# OBSERVAÇÕES
+# =========================
+nova_observacao = st.text_area(
+    "OBSERVAÇÃO",
+    value=r.get(
+        "observacao",
+        ""
+    )
+)
+
+nova_evidencia = st.text_input(
+    "EVIDÊNCIA",
+    value=r.get(
+        "evidencia1",
+        ""
+    )
+)
+
+# =========================
+# SALVAR ALTERAÇÕES
+# =========================
+if st.button(
+    "Salvar alterações"
+):
+
+    # histórico
+    (
+        supabase.table(
+            "cobrancas_log"
+        )
+        .insert({
+            "boleto": novo_boleto,
+            "pagador": novo_pagador,
+            "valor_cobrado":
+                novo_valor_cobrado
+        })
+        .execute()
+    )
+
+    # update
+    (
+        supabase.table(
+            "cobrancas"
+        )
+        .update({
+
+            "boleto":
+                novo_boleto,
+
+            "seu_numero":
+                novo_seu_numero,
+
+            "pagador":
+                novo_pagador,
+
+            "valor_do_titulo":
+                novo_valor_titulo,
+
+            "valor_cobrado":
+                novo_valor_cobrado,
+
+            "oscilacao":
+                nova_oscilacao,
+
+            "vencimento":
+                str(
+                    novo_vencimento
+                ),
+
+            "data_da_liquidacao":
+                str(
+                    nova_data_pagamento
+                ),
+
+            "lote":
+                novo_lote,
+
+            "observacao":
+                nova_observacao,
+
+            "evidencia1":
+                nova_evidencia
+
+        })
+        .eq(
+            "boleto",
+            st.session_state[
+                "boleto_edit"
+            ]
+        )
+        .execute()
+    )
+
+    # =========================
+    # LOG AUDITORIA
+    # =========================
+    registrar_log(
+        acao="EDITAR",
+
+        boleto=novo_boleto,
+
+        seu_numero=
+            novo_seu_numero,
+
+        pagador=
+            novo_pagador,
+
+        valor_anterior=
+            r.get(
+                "valor_cobrado"
+            ),
+
+        valor_novo=
+            novo_valor_cobrado,
+
+        observacao=
+            "Registro editado"
+    )
+
+    st.success(
+        "✅ Registro atualizado!"
+    )
 # =============================
 # EXCLUIR
 # =============================
