@@ -1346,6 +1346,9 @@ elif menu == "Usuários":
 
     st.title("👥 Usuários")
 
+    # =============================
+    # CRIAR USUÁRIO
+    # =============================
     st.subheader("➕ Criar usuário")
 
     col1, col2 = st.columns(2)
@@ -1364,6 +1367,7 @@ elif menu == "Usuários":
     perfil_usuario = col3.selectbox(
         "Perfil",
         [
+            "superadmin",
             "admin",
             "operador",
             "leitura"
@@ -1383,9 +1387,6 @@ elif menu == "Usuários":
             )
             st.stop()
 
-        # =========================
-        # VERIFICAR DUPLICIDADE
-        # =========================
         existe = (
             supabase.table("usuarios")
             .select("usuario")
@@ -1402,17 +1403,11 @@ elif menu == "Usuários":
             )
             st.stop()
 
-        # =========================
-        # HASH SENHA
-        # =========================
         senha_hash = bcrypt.hashpw(
             nova_senha.encode(),
             bcrypt.gensalt()
         ).decode()
 
-        # =========================
-        # INSERT
-        # =========================
         (
             supabase.table("usuarios")
             .insert({
@@ -1435,9 +1430,16 @@ elif menu == "Usuários":
             "✅ Usuário criado!"
         )
 
+        st.rerun()
+
     st.markdown("---")
 
-    st.subheader("📋 Usuários cadastrados")
+    # =============================
+    # GERENCIAR USUÁRIOS
+    # =============================
+    st.subheader(
+        "⚙️ Gerenciar usuários"
+    )
 
     res = (
         supabase.table("usuarios")
@@ -1445,19 +1447,167 @@ elif menu == "Usuários":
         .execute()
     )
 
-    df_users = pd.DataFrame(res.data)
+    usuarios = res.data
 
-    if not df_users.empty:
+    for user in usuarios:
 
-        mostrar = df_users[
-            [
-                "usuario",
-                "perfil",
-                "ativo"
-            ]
-        ]
-
-        st.dataframe(
-            mostrar,
-            use_container_width=True
+        usuario = user.get(
+            "usuario"
         )
+
+        perfil_atual = user.get(
+            "perfil",
+            "leitura"
+        )
+
+        ativo_atual = user.get(
+            "ativo",
+            True
+        )
+
+        with st.expander(
+            f"👤 {usuario} ({perfil_atual})"
+        ):
+
+            novo_perfil = st.selectbox(
+                "Perfil",
+                [
+                    "superadmin",
+                    "admin",
+                    "operador",
+                    "leitura"
+                ],
+                index=[
+                    "superadmin",
+                    "admin",
+                    "operador",
+                    "leitura"
+                ].index(perfil_atual),
+                key=f"perfil_{usuario}"
+            )
+
+            novo_ativo = st.checkbox(
+                "Usuário ativo",
+                value=ativo_atual,
+                key=f"ativo_{usuario}"
+            )
+
+            nova_senha_user = st.text_input(
+                "Nova senha (opcional)",
+                type="password",
+                key=f"senha_{usuario}"
+            )
+
+            col_btn1, col_btn2 = st.columns(2)
+
+            # =====================
+            # SALVAR
+            # =====================
+            if col_btn1.button(
+                "💾 Salvar alterações",
+                key=f"salvar_{usuario}"
+            ):
+
+                dados_update = {
+                    "perfil":
+                        novo_perfil,
+
+                    "ativo":
+                        novo_ativo
+                }
+
+                if nova_senha_user:
+
+                    senha_hash = (
+                        bcrypt.hashpw(
+                            nova_senha_user.encode(),
+                            bcrypt.gensalt()
+                        ).decode()
+                    )
+
+                    dados_update[
+                        "senha_hash"
+                    ] = senha_hash
+
+                (
+                    supabase.table(
+                        "usuarios"
+                    )
+                    .update(
+                        dados_update
+                    )
+                    .eq(
+                        "usuario",
+                        usuario
+                    )
+                    .execute()
+                )
+
+                st.success(
+                    f"{usuario} atualizado!"
+                )
+
+                st.rerun()
+
+            # =====================
+            # EXCLUIR
+            # =====================
+            if col_btn2.button(
+                "🗑 Excluir usuário",
+                key=f"delete_{usuario}"
+            ):
+
+                # impedir excluir si mesmo
+                if (
+                    usuario
+                    == st.session_state.get(
+                        "usuario"
+                    )
+                ):
+                    st.error(
+                        "Você não pode excluir seu próprio usuário."
+                    )
+                    st.stop()
+
+                # impedir excluir último superadmin
+                supers = (
+                    supabase.table(
+                        "usuarios"
+                    )
+                    .select("*")
+                    .eq(
+                        "perfil",
+                        "superadmin"
+                    )
+                    .execute()
+                )
+
+                if (
+                    perfil_atual
+                    == "superadmin"
+                    and len(
+                        supers.data
+                    ) <= 1
+                ):
+                    st.error(
+                        "Não é possível excluir o último superadmin."
+                    )
+                    st.stop()
+
+                (
+                    supabase.table(
+                        "usuarios"
+                    )
+                    .delete()
+                    .eq(
+                        "usuario",
+                        usuario
+                    )
+                    .execute()
+                )
+
+                st.success(
+                    f"{usuario} removido!"
+                )
+
+                st.rerun()
