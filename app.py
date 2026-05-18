@@ -729,6 +729,25 @@ elif menu == "Consulta":
     df = df.rename(columns=COLUNAS_AMIGAVEIS)
 
     # =============================
+    # ALERTA DE PENDENTES
+    # =============================
+    pendentes = (
+        supabase.table("cobrancas")
+        .select("*")
+        .eq("pendente", True)
+        .execute()
+    )
+    
+    if pendentes.data:
+    
+        st.warning(
+            f"⚠️ Você tem {len(pendentes.data)} registros pendentes de atualização"
+        )
+    
+        if st.button("🔎 Ver pendentes"):
+            st.session_state["ver_pendentes"] = True
+
+    # =============================
     # MOSTRAR RESULTADOS
     # =============================
     st.dataframe(
@@ -896,6 +915,8 @@ elif menu == "Inserir":
         
                     "observacao": observacao,
                     "evidencia1": evidencia1
+
+                    "pendente": True
         
                 }).execute()
 
@@ -1262,44 +1283,22 @@ elif menu == "Editar":
                 )
                 .update({
         
-                    "boleto":
-                        novo_boleto,
-        
-                    "seu_numero":
-                        novo_seu_numero,
-        
-                    "pagador":
-                        novo_pagador,
-        
-                    "valor_do_titulo":
-                        novo_valor_titulo,
-        
-                    "valor_cobrado":
-                        novo_valor_cobrado,
-        
-                    "oscilacao":
-                        nova_oscilacao,
-        
-                    "vencimento":
-                        str(
-                            novo_vencimento
-                        ),
-        
-                    "data_da_liquidacao":
-                        str(
-                            nova_data_pagamento
-                        ),
-        
-                    "lote":
-                        novo_lote,
-        
-                    "observacao":
-                        nova_observacao,
-        
-                    "evidencia1":
-                        nova_evidencia
-        
+                    "pagador": novo_pagador,
+                    "valor_do_titulo": novo_valor_titulo,
+                    "valor_cobrado": novo_valor_cobrado,
+                    "oscilacao": nova_oscilacao,
+                
+                    "vencimento": str(novo_vencimento),
+                    "data_da_liquidacao": str(nova_data_pagamento),
+                
+                    "lote": novo_lote,
+                    "observacao": nova_observacao,
+                    "evidencia1": nova_evidencia,
+                
+                    "pendente": False   # 👈 RESOLVE AQUI
+                
                 })
+        
                 .eq(
                     "boleto",
                     st.session_state[
