@@ -1319,3 +1319,133 @@ elif menu == "Histórico":
         st.stop()
 
     st.title("🕓 Histórico")
+
+# =============================
+# USUÁRIOS
+# =============================
+elif menu == "Usuários":
+
+    # =============================
+    # PERMISSÃO
+    # =============================
+    if st.session_state.get("perfil") != "admin":
+        st.error("⛔ Acesso negado")
+        st.stop()
+
+    st.title("👥 Usuários")
+
+    st.subheader("➕ Criar usuário")
+
+    col1, col2 = st.columns(2)
+
+    novo_usuario = col1.text_input(
+        "Usuário"
+    )
+
+    nova_senha = col2.text_input(
+        "Senha",
+        type="password"
+    )
+
+    col3, col4 = st.columns(2)
+
+    perfil_usuario = col3.selectbox(
+        "Perfil",
+        [
+            "admin",
+            "operador",
+            "leitura"
+        ]
+    )
+
+    ativo = col4.checkbox(
+        "Usuário ativo",
+        value=True
+    )
+
+    if st.button("Criar usuário"):
+
+        if not novo_usuario or not nova_senha:
+            st.warning(
+                "Preencha usuário e senha"
+            )
+            st.stop()
+
+        # =========================
+        # VERIFICAR DUPLICIDADE
+        # =========================
+        existe = (
+            supabase.table("usuarios")
+            .select("usuario")
+            .eq(
+                "usuario",
+                novo_usuario
+            )
+            .execute()
+        )
+
+        if existe.data:
+            st.error(
+                "Usuário já existe"
+            )
+            st.stop()
+
+        # =========================
+        # HASH SENHA
+        # =========================
+        senha_hash = bcrypt.hashpw(
+            nova_senha.encode(),
+            bcrypt.gensalt()
+        ).decode()
+
+        # =========================
+        # INSERT
+        # =========================
+        (
+            supabase.table("usuarios")
+            .insert({
+                "usuario":
+                    novo_usuario,
+
+                "senha_hash":
+                    senha_hash,
+
+                "perfil":
+                    perfil_usuario,
+
+                "ativo":
+                    ativo
+            })
+            .execute()
+        )
+
+        st.success(
+            "✅ Usuário criado!"
+        )
+
+    st.markdown("---")
+
+    st.subheader("📋 Usuários cadastrados")
+
+    res = (
+        supabase.table("usuarios")
+        .select("*")
+        .execute()
+    )
+
+    df_users = pd.DataFrame(res.data)
+
+    if not df_users.empty:
+
+        mostrar = df_users[
+            [
+                "usuario",
+                "perfil",
+                "ativo"
+            ]
+        ]
+
+        st.dataframe(
+            mostrar,
+            use_container_width=True
+        )
