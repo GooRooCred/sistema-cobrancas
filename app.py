@@ -241,6 +241,12 @@ else:
         "Consulta"
     ]
 
+# 🔥 ESTA PARTE É OBRIGATÓRIA
+menu = st.sidebar.radio(
+    "📌 Menu",
+    opcoes_menu
+)
+
 # =============================
 # CONTROLE DE TROCA DE MENU
 # =============================
