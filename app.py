@@ -311,8 +311,8 @@ if menu_anterior != menu:
     if "registro" in st.session_state:
         del st.session_state["registro"]
 
-    if "boleto_edit" not in st.session_state:
-        st.session_state["boleto_edit"] = ""
+    if "boleto_edit" in st.session_state:
+        del st.session_state["boleto_edit"]
 
 st.session_state["menu_anterior"] = menu
 
@@ -321,7 +321,7 @@ if st.sidebar.button("Logout"):
     st.session_state.clear()
 
     st.rerun()
-
+    
 st.sidebar.markdown("---")
 
 if "usuario" in st.session_state:
@@ -333,6 +333,7 @@ if "usuario" in st.session_state:
     st.sidebar.write(
         f"🔐 Perfil: {st.session_state.get('perfil', '')}"
     )
+
 
 st.sidebar.caption(
     "Sistema Base Geral - Conciliação GooRoo v1.0"
