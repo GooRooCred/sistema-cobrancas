@@ -188,11 +188,45 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =============================
-# MENU
+# MENU POR PERFIL
 # =============================
+perfil = st.session_state.get(
+    "perfil",
+    "leitura"
+)
+
+if perfil == "admin":
+
+    opcoes_menu = [
+        "Dashboard",
+        "Consulta",
+        "Inserir",
+        "Editar",
+        "Excluir",
+        "Histórico",
+        "Usuários"
+    ]
+
+elif perfil == "operador":
+
+    opcoes_menu = [
+        "Dashboard",
+        "Consulta",
+        "Inserir",
+        "Editar",
+        "Histórico"
+    ]
+
+else:
+
+    opcoes_menu = [
+        "Dashboard",
+        "Consulta"
+    ]
+
 menu = st.sidebar.radio(
     "📌 Menu",
-    ["Dashboard", "Consulta", "Inserir", "Editar", "Excluir", "Histórico"]
+    opcoes_menu
 )
 
 # =============================
