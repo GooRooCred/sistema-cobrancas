@@ -4,5 +4,6 @@ pandas
 openpyxl
 streamlit
 numpy
+bcrypt
 pandas>=2.2
 pillow>=10.4
