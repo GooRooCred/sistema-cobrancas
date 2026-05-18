@@ -108,8 +108,7 @@ if not st.session_state["logado"]:
                 .eq("ativo", True)
                 .execute()
             )
-            st.write(res.data)
-
+          
             if not res.data:
                 st.error("Usuário ou senha inválidos")
                 st.stop()
