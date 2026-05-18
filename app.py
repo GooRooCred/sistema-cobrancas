@@ -1095,31 +1095,22 @@ elif menu == "Editar":
     # =============================
     # BUSCAR BOLETO
     # =============================
-    boleto = st.text_input(
-        "Digite o boleto"
-    )
-    
+    boleto = st.text_input("Digite o boleto").strip()
+
     if st.button("Buscar") and boleto:
     
         res = (
             supabase.table("cobrancas")
             .select("*")
-            .eq("boleto", boleto)
+            .eq("boleto", str(boleto))
             .execute()
         )
     
         if res.data:
-    
-            st.session_state[
-                "registro_excluir"
-            ] = (
-                res.data[0]
-            )
+            st.session_state["registro_excluir"] = res.data[0]
     
         else:
-            st.warning(
-                "Boleto não encontrado"
-            )
+            st.warning("Boleto não encontrado")
 
     # =============================
     # MOSTRAR REGISTRO
