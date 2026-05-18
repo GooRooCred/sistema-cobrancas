@@ -691,6 +691,7 @@ elif menu == "Consulta":
     res = query.limit(200).execute()
     
     df = pd.DataFrame(res.data)
+    
     # =============================
     # FORMATA DATAS
     # =============================
@@ -707,6 +708,13 @@ elif menu == "Consulta":
                 df[col],
                 errors="coerce"
             ).dt.strftime("%d/%m/%Y")
+
+    pendentes = (
+        supabase.table("cobrancas")
+        .select("*")
+        .eq("pendente", True)
+        .execute()
+    )
 
     # =============================
     # FORMATA VALORES
@@ -739,13 +747,30 @@ elif menu == "Consulta":
     )
     
     if pendentes.data:
-    
+
         st.warning(
             f"⚠️ Você tem {len(pendentes.data)} registros pendentes de atualização"
         )
     
-        if st.button("🔎 Ver pendentes"):
+        if st.button("🔎 Ver pendentes") or st.session_state.get("ver_pendentes"):
             st.session_state["ver_pendentes"] = True
+    
+            st.markdown("### 📌 Pendentes")
+    
+            for item in pendentes.data:
+    
+                label = f"{item['boleto']} - {item.get('pagador','')}"
+    
+                if st.button(label, key=f"pend_{item['boleto']}"):
+    
+                    st.session_state["registro"] = item
+                    st.session_state["boleto_edit"] = item["boleto"]
+                    st.session_state["menu"] = "Editar"
+                    st.rerun()
+    
+        if st.button("❌ Fechar lista"):
+            st.session_state["ver_pendentes"] = False
+            st.rerun()
 
     # =============================
     # MOSTRAR RESULTADOS
@@ -891,6 +916,11 @@ elif menu == "Inserir":
             
         observacao = st.text_area("OBSERVAÇÃO")
         evidencia1 = st.text_input("EVIDÊNCIA")
+
+        pendente = st.checkbox(
+            "Marcar como pendente",
+            value=True
+        )
             
         submit = st.button("Salvar")
 
@@ -915,8 +945,9 @@ elif menu == "Inserir":
         
                     "observacao": observacao,
                     "evidencia1": evidencia1,
-
-                    "pendente": True
+                    
+                    "pendente": True,
+                    "pendente": pendente
         
                 }).execute()
 
@@ -1111,6 +1142,12 @@ elif menu == "Editar":
         st.stop()
 
     st.title("✏️ Editar")
+
+    if not st.session_state.get("registro"):
+        st.info("Nenhum registro selecionado. Vá na Consulta e clique em um item.")
+        st.stop()
+    
+    r = st.session_state["registro"]
     # =============================
     # BUSCAR BOLETO
     # =============================
@@ -1255,6 +1292,13 @@ elif menu == "Editar":
             )
         )
 
+        pendente_atual = r.get("pendente", False)
+
+        pendente = st.checkbox(
+            "Marcar como pendente",
+            value=pendente_atual
+        )
+
         # =========================
         # SALVAR ALTERAÇÕES
         # =========================
@@ -1295,7 +1339,8 @@ elif menu == "Editar":
                     "observacao": nova_observacao,
                     "evidencia1": nova_evidencia,
                 
-                    "pendente": False   # 👈 RESOLVE AQUI
+                    "pendente": False,   # 👈 RESOLVE AQUI
+                    "pendente": pendente
                 
                 })
         
