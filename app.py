@@ -39,6 +39,60 @@ def to_float(valor):
     except:
         return 0.0
 
+# =============================
+# LOG AUDITORIA
+# =============================
+def registrar_log(
+    acao,
+    boleto=None,
+    seu_numero=None,
+    pagador=None,
+    valor_anterior=None,
+    valor_novo=None,
+    observacao=None
+):
+
+    try:
+
+        supabase.table(
+            "auditoria"
+        ).insert({
+
+            "usuario":
+                st.session_state.get(
+                    "usuario"
+                ),
+
+            "perfil":
+                st.session_state.get(
+                    "perfil"
+                ),
+
+            "acao":
+                acao,
+
+            "boleto":
+                boleto,
+
+            "seu_numero":
+                seu_numero,
+
+            "pagador":
+                pagador,
+
+            "valor_anterior":
+                valor_anterior,
+
+            "valor_novo":
+                valor_novo,
+
+            "observacao":
+                observacao
+
+        }).execute()
+
+    except:
+        pass
 
 COLUNAS_AMIGAVEIS = {
     "seu_numero": "SEU NUMERO",
