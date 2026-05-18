@@ -219,16 +219,18 @@ if st.sidebar.button("Logout"):
     
 st.sidebar.markdown("---")
 
-st.sidebar.write(
-    f"👤 {st.session_state['usuario']}"
-)
+if "usuario" in st.session_state:
 
-st.sidebar.write(
-    f"🔐 Perfil: {st.session_state['perfil']}"
-)
+    st.sidebar.write(
+        f"👤 {st.session_state.get('usuario', '')}"
+    )
+
+    st.sidebar.write(
+        f"🔐 Perfil: {st.session_state.get('perfil', '')}"
+    )
 
 st.sidebar.caption(
-    "Sistema Base Geral Conciliação GooRoo v1.0"
+    "Sistema Base Geral - Conciliação GooRoo v1.0"
 )
 
 # =============================
