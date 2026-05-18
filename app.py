@@ -284,8 +284,7 @@ elif perfil == "operador":
         "Dashboard",
         "Consulta",
         "Inserir",
-        "Editar",
-        "Histórico"
+        "Editar"
     ]
 
 else:
