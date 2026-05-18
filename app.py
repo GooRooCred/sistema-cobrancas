@@ -1243,7 +1243,7 @@ elif menu == "Editar":
         if st.button(
             "Salvar alterações"
         ):
-
+        
             # histórico
             (
                 supabase.table(
@@ -1257,51 +1257,51 @@ elif menu == "Editar":
                 })
                 .execute()
             )
-
+        
             # update
             (
                 supabase.table(
                     "cobrancas"
                 )
                 .update({
-
+        
                     "boleto":
                         novo_boleto,
-
+        
                     "seu_numero":
                         novo_seu_numero,
-
+        
                     "pagador":
                         novo_pagador,
-
+        
                     "valor_do_titulo":
                         novo_valor_titulo,
-
+        
                     "valor_cobrado":
                         novo_valor_cobrado,
-
+        
                     "oscilacao":
                         nova_oscilacao,
-
+        
                     "vencimento":
                         str(
                             novo_vencimento
                         ),
-
+        
                     "data_da_liquidacao":
                         str(
                             nova_data_pagamento
                         ),
-
+        
                     "lote":
                         novo_lote,
-
+        
                     "observacao":
                         nova_observacao,
-
+        
                     "evidencia1":
                         nova_evidencia
-
+        
                 })
                 .eq(
                     "boleto",
@@ -1311,7 +1311,33 @@ elif menu == "Editar":
                 )
                 .execute()
             )
-
+        
+            # =========================
+            # LOG AUDITORIA
+            # =========================
+            registrar_log(
+                acao="EDITAR",
+        
+                boleto=novo_boleto,
+        
+                seu_numero=
+                    novo_seu_numero,
+        
+                pagador=
+                    novo_pagador,
+        
+                valor_anterior=
+                    r.get(
+                        "valor_cobrado"
+                    ),
+        
+                valor_novo=
+                    novo_valor_cobrado,
+        
+                observacao=
+                    "Registro editado"
+            )
+        
             st.success(
                 "✅ Registro atualizado!"
             )
