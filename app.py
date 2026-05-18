@@ -758,6 +758,17 @@ elif menu == "Inserir":
     st.title("➕ Inserir Registros")
 
     # =============================
+    # ESCOLHA TIPO
+    # =============================
+    aba = st.radio(
+        "Escolha o tipo de inserção:",
+        [
+            "Manual",
+            "Importar Excel"
+        ]
+    )
+
+    # =============================
     # MANUAL
     # =============================
     if aba == "Manual":
@@ -766,26 +777,33 @@ elif menu == "Inserir":
 
         boleto = col1.text_input("BOLETO")
         seu_numero = col2.text_input("SEU NUMERO")
-            
+
         pagador = st.text_input("CLIENTE")
-            
+
         col3, col4 = st.columns(2)
-            
-        valor_titulo = col3.number_input("R$ TITULO", step=0.01)
-        valor_cobrado = col4.number_input("R$ COBRADO", step=0.01)
-            
+
+        valor_titulo = col3.number_input(
+            "R$ TITULO",
+            step=0.01
+        )
+
+        valor_cobrado = col4.number_input(
+            "R$ COBRADO",
+            step=0.01
+        )
+
         col5, col6 = st.columns(2)
 
         vencimento = col5.date_input(
             "VENCIMENTO",
             format="DD/MM/YYYY"
         )
-            
+
         data_pagamento = col6.date_input(
-             "DATA PAGAMENTO",
-             format="DD/MM/YYYY"
+            "DATA PAGAMENTO",
+            format="DD/MM/YYYY"
         )
-            
+
         col7, col8 = st.columns(2)
             
         # =============================
