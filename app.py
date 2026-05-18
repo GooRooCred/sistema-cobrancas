@@ -1358,6 +1358,9 @@ elif menu == "Excluir":
     # =========================
     # BUSCAR REGISTRO
     # =========================
+    boleto = st.text_input(
+        "Digite o boleto"
+    )
     if st.button("Buscar") and boleto:
 
         res = (
