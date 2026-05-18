@@ -1092,6 +1092,13 @@ elif menu == "Editar":
         st.stop()
 
     st.title("✏️ Editar")
+    # =========================
+    # REGISTRO
+    # =========================
+    r = st.session_state.get(
+        "registro",
+        {}
+    )
 
     # =========================
     # CAMPOS
