@@ -803,7 +803,7 @@ elif menu == "Inserir":
 
     if st.session_state.get("perfil") not in [
         "admin",
-        "operador"
+        "superadmin"
     ]:
         st.error("⛔ Acesso negado")
         st.stop()
