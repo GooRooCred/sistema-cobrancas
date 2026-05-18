@@ -312,7 +312,7 @@ if menu_anterior != menu:
         del st.session_state["registro"]
 
     if "boleto_edit" not in st.session_state:
-    st.session_state["boleto_edit"] = ""
+        st.session_state["boleto_edit"] = ""
 
 st.session_state["menu_anterior"] = menu
 
