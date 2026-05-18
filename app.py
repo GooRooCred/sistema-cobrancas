@@ -914,7 +914,7 @@ elif menu == "Inserir":
                     "lote": lote,
         
                     "observacao": observacao,
-                    "evidencia1": evidencia1
+                    "evidencia1": evidencia1,
 
                     "pendente": True
         
