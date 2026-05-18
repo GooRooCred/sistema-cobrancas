@@ -1093,33 +1093,7 @@ elif menu == "Editar":
 
     st.title("✏️ Editar")
 
-    # =============================
-    # BUSCAR BOLETO
-    # =============================
-    boleto = st.text_input("Digite o boleto").strip()
-
-    if st.button("Buscar") and boleto:
     
-        res = (
-            supabase.table("cobrancas")
-            .select("*")
-            .eq("boleto", str(boleto))
-            .execute()
-        )
-    
-        if res.data:
-            st.session_state["registro"] = res.data[0]
-    
-        else:
-            st.warning("Boleto não encontrado")
-
-    # =============================
-    # MOSTRAR REGISTRO
-    # =============================
-    if "registro" in st.session_state:
-
-        r = st.session_state["registro"]
-
         # =========================
         # CAMPOS
         # =========================
