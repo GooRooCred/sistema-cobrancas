@@ -716,9 +716,14 @@ elif menu == "Consulta":
 # =============================
 elif menu == "Inserir":
 
-    st.title("➕ Inserir Registros")
+    if st.session_state.get("perfil") not in [
+        "admin",
+        "operador"
+    ]:
+        st.error("⛔ Acesso negado")
+        st.stop()
 
-    aba = st.radio("Escolha o tipo de inserção:", ["Manual", "Importar Excel"])
+    st.title("➕ Inserir Registros")
 
     # =============================
     # MANUAL
@@ -959,21 +964,15 @@ elif menu == "Inserir":
 # EDITAR
 # =============================
 elif menu == "Editar":
+
+    if st.session_state.get("perfil") not in [
+        "admin",
+        "operador"
+    ]:
+        st.error("⛔ Acesso negado")
+        st.stop()
+
     st.title("✏️ Editar")
-
-    boleto = st.text_input("Digite o boleto")
-
-    if st.button("Buscar") and boleto:
-        res = supabase.table("cobrancas").select("*").eq("boleto", boleto).execute()
-
-        if res.data:
-            st.session_state["registro"] = res.data[0]
-            st.session_state["boleto_edit"] = boleto
-        else:
-            st.warning("Boleto não encontrado")
-
-    if "registro" in st.session_state:
-        r = st.session_state["registro"]
 
         # =========================
         # CAMPOS
@@ -1104,10 +1103,14 @@ elif menu == "Editar":
 # =============================
 elif menu == "Excluir":
 
+    # =============================
+    # PERMISSÃO
+    # =============================
+    if st.session_state.get("perfil") != "admin":
+        st.error("⛔ Acesso negado")
+        st.stop()
+
     st.title("❌ Excluir")
-
-    boleto = st.text_input("Digite o boleto")
-
     # =========================
     # BUSCAR REGISTRO
     # =========================
@@ -1164,12 +1167,12 @@ elif menu == "Excluir":
 # HISTÓRICO
 # =============================
 elif menu == "Histórico":
+
+    if st.session_state.get("perfil") not in [
+        "admin",
+        "operador"
+    ]:
+        st.error("⛔ Acesso negado")
+        st.stop()
+
     st.title("🕓 Histórico")
-
-    boleto = st.text_input("Boleto")
-
-    if st.button("Buscar"):
-        res = supabase.table("cobrancas_log").select("*").eq("boleto", boleto).execute()
-        df = pd.DataFrame(res.data)
-
-        st.dataframe(df, use_container_width=True)
