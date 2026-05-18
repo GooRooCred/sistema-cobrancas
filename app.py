@@ -134,6 +134,14 @@ SUPABASE_KEY = "sb_publishable_GZQLNBq0Ag8UMxNWZZs_Dg_B_bdejTc"
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# =============================
+# ESTADO GLOBAL (OBRIGATÓRIO)
+# =============================
+st.session_state.setdefault("logado", False)
+st.session_state.setdefault("usuario", None)
+st.session_state.setdefault("perfil", None)
+st.session_state.setdefault("registro", None)
+
 st.set_page_config(
     page_title="Sistema de Cobranças",
     page_icon="💰",
@@ -204,6 +212,7 @@ if not st.session_state["logado"]:
             )
 
     st.stop()
+
 
 # =============================
 # ESTILO
@@ -310,10 +319,7 @@ if menu_anterior != menu:
     # limpa edição anterior
     if "registro" in st.session_state:
         del st.session_state["registro"]
-
-    if "boleto_edit" in st.session_state:
-        del st.session_state["boleto_edit"]
-
+   
 st.session_state["menu_anterior"] = menu
 
 if st.sidebar.button("Logout"):
@@ -1092,37 +1098,54 @@ elif menu == "Editar":
         st.stop()
 
     st.title("✏️ Editar")
+
+    # =============================
+    # BUSCA DO BOLETO (EDITAR)
+    # =============================
+    boleto_editar = st.text_input("Digite o boleto para editar")
+    
+    if boleto_editar:
+    
+        res = (
+            supabase.table("cobrancas")
+            .select("*")
+            .eq("boleto", boleto_editar)
+            .execute()
+        )
+    
+        if res.data:
+            st.session_state["registro"] = res.data[0]
+        else:
+            st.session_state["registro"] = None
+
+    # =============================
+    # PROTEÇÃO DO REGISTRO
+    # =============================
+    registro = st.session_state.get("registro")
+
+    if not registro:
+        st.info("🔎 Busque um boleto para editar na parte superior")
+        st.stop()
     # =============================
     # BUSCAR BOLETO
     # =============================
-    boleto = st.text_input(
-        "Digite o boleto"
-    )
+    boleto_editar = st.text_input("Digite o boleto para editar")
 
-    if st.button("Buscar") and boleto:
-
+    if boleto_editar:
+    
         res = (
             supabase.table("cobrancas")
             .select("*")
             .eq("boleto", boleto)
             .execute()
         )
-
+    
         if res.data:
-
-            st.session_state["registro"] = (
-                res.data[0]
-            )
-
-            st.session_state["boleto_edit"] = (
-                boleto
-            )
-
+            st.session_state["registro"] = res.data[0]
+            st.success("Registro carregado!")
         else:
-            st.warning(
-                "Boleto não encontrado"
-            )
-
+            st.session_state["registro"] = None
+            st.warning("Boleto não encontrado")
     # =============================
     # MOSTRAR REGISTRO
     # =============================
@@ -1304,7 +1327,7 @@ elif menu == "Editar":
                 })
                 .eq(
                     "boleto",
-                    st.session_state[
+                    registro[
                         "boleto_edit"
                     ]
                 )
