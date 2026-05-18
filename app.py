@@ -1414,15 +1414,48 @@ elif menu == "Excluir":
         # =========================
         if st.button("🗑 Confirmar Exclusão"):
 
+            # =========================
+            # LOG AUDITORIA
+            # =========================
+            registrar_log(
+                acao="EXCLUIR",
+        
+                boleto=r.get(
+                    "boleto"
+                ),
+        
+                seu_numero=r.get(
+                    "seu_numero"
+                ),
+        
+                pagador=r.get(
+                    "pagador"
+                ),
+        
+                valor_anterior=r.get(
+                    "valor_cobrado"
+                ),
+        
+                observacao=
+                    "Registro excluído"
+            )
+        
             (
-                supabase.table("cobrancas")
+                supabase.table(
+                    "cobrancas"
+                )
                 .delete()
-                .eq("boleto", r.get("boleto"))
+                .eq(
+                    "boleto",
+                    r.get("boleto")
+                )
                 .execute()
             )
-
-            del st.session_state["registro_excluir"]
-
+        
+            del st.session_state[
+                "registro_excluir"
+            ]
+        
             st.success(
                 "Registro excluído com sucesso!"
             )
