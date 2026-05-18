@@ -412,23 +412,27 @@ if menu == "Dashboard":
         # AGRUPAMENTO OPERACIONAL
         # =============================
         if not df_operacional.empty:
-    
+        
             agrupado = (
                 df_operacional.groupby("pagador")
-                .size()
-                .reset_index(name="quantidade")
-                .sort_values("quantidade", ascending=False)
+                .agg(
+                    quantidade=("pagador", "size"),
+                    valor_total=("valor_cobrado", "sum")
+                )
+                .reset_index()
+                .sort_values("valor_total", ascending=False)
             )
-    
+        
             st.markdown("### 📋 Detalhamento")
-    
+        
             for _, row in agrupado.iterrows():
-    
+        
                 st.write(
                     f"• {row['pagador']} "
-                    f"({row['quantidade']} registros)"
+                    f"({row['quantidade']} registros) "
+                    f"- R$ {format_brl(row['valor_total'])}"
                 )
-    
+        
     else:
         st.info("Nenhum dado encontrado no período.")
     # =============================
