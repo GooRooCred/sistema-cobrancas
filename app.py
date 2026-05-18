@@ -458,7 +458,7 @@ if menu == "Dashboard":
     col4, col5, col6 = st.columns(3)
 
     col4.metric(
-        "📄 Boletos no Período",
+        "📄 Registros no Período",
         total_boletos
     )
 
