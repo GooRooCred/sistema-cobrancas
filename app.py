@@ -1540,70 +1540,70 @@ elif menu == "Histórico":
         res.data
     )
 
-# =============================
-# FORMATAR
-# =============================
-if not df_hist.empty:
-
-    if "data_hora" in df_hist.columns:
-
-        df_hist[
-            "data_hora"
-        ] = pd.to_datetime(
+    # =============================
+    # FORMATAR
+    # =============================
+    if not df_hist.empty:
+    
+        if "data_hora" in df_hist.columns:
+    
             df_hist[
                 "data_hora"
+            ] = pd.to_datetime(
+                df_hist[
+                    "data_hora"
+                ]
+            ).dt.strftime(
+                "%d/%m/%Y %H:%M"
+            )
+    
+        if "valor_anterior" in df_hist.columns:
+    
+            df_hist[
+                "valor_anterior"
+            ] = df_hist[
+                "valor_anterior"
+            ].fillna(0).apply(
+                lambda x:
+                f"R$ {format_brl(x)}"
+            )
+    
+        if "valor_novo" in df_hist.columns:
+    
+            df_hist[
+                "valor_novo"
+            ] = df_hist[
+                "valor_novo"
+            ].fillna(0).apply(
+                lambda x:
+                f"R$ {format_brl(x)}"
+            )
+    
+        mostrar = df_hist[
+            [
+                "data_hora",
+                "usuario",
+                "perfil",
+                "acao",
+                "boleto",
+                "pagador",
+                "valor_anterior",
+                "valor_novo",
+                "observacao"
             ]
-        ).dt.strftime(
-            "%d/%m/%Y %H:%M"
-        )
-
-    if "valor_anterior" in df_hist.columns:
-
-        df_hist[
-            "valor_anterior"
-        ] = df_hist[
-            "valor_anterior"
-        ].fillna(0).apply(
-            lambda x:
-            f"R$ {format_brl(x)}"
-        )
-
-    if "valor_novo" in df_hist.columns:
-
-        df_hist[
-            "valor_novo"
-        ] = df_hist[
-            "valor_novo"
-        ].fillna(0).apply(
-            lambda x:
-            f"R$ {format_brl(x)}"
-        )
-
-    mostrar = df_hist[
-        [
-            "data_hora",
-            "usuario",
-            "perfil",
-            "acao",
-            "boleto",
-            "pagador",
-            "valor_anterior",
-            "valor_novo",
-            "observacao"
         ]
-    ]
-
-    st.dataframe(
-        mostrar,
-        use_container_width=True,
-        height=500
-    )
-
-else:
-
-    st.info(
-        "Nenhum histórico encontrado."
-    )
+    
+        st.dataframe(
+            mostrar,
+            use_container_width=True,
+            height=500
+        )
+    
+    else:
+    
+        st.info(
+            "Nenhum histórico encontrado."
+        )
 
 # =============================
 # USUÁRIOS
