@@ -900,6 +900,18 @@ elif menu == "Inserir":
                     "evidencia1": evidencia1
         
                 }).execute()
+
+                # =============================
+                # LOG
+                # =============================
+                registrar_log(
+                    acao="INSERIR",
+                    boleto=boleto,
+                    seu_numero=seu_numero,
+                    pagador=pagador,
+                    valor_novo=valor_cobrado,
+                    observacao="Inserção manual"
+                )
         
                 st.success("✅ Registro inserido com sucesso!")
         
