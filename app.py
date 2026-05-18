@@ -1102,7 +1102,10 @@ elif menu == "Editar":
     # =============================
     # BUSCA DO BOLETO (EDITAR)
     # =============================
-    boleto_editar = st.text_input("Digite o boleto para editar")
+    boleto_editar = st.text_input(
+        "Digite o boleto para editar",
+        key="boleto_editar_input"
+    )
     
     if boleto_editar:
     
@@ -1129,7 +1132,10 @@ elif menu == "Editar":
     # =============================
     # BUSCAR BOLETO
     # =============================
-    boleto_editar = st.text_input("Digite o boleto para editar")
+    boleto_editar = st.text_input(
+        "Digite o boleto para editar",
+        key="boleto_editar_input"
+    )
 
     if boleto_editar:
     
