@@ -1153,12 +1153,15 @@ elif menu == "Editar":
         st.stop()
 
     st.title("✏️ Editar")
+    
+    registro = st.session_state.get("registro")
 
-    if not st.session_state.get("registro"):
-        st.info("Nenhum registro selecionado. Vá na Consulta e clique em um item.")
+    if not registro:
+        st.info("Nenhum registro selecionado.")
         st.stop()
     
-    r = st.session_state["registro"]
+    r = registro
+    
     # =============================
     # BUSCAR BOLETO
     # =============================
@@ -1193,9 +1196,10 @@ elif menu == "Editar":
     # =============================
     # MOSTRAR REGISTRO
     # =============================
-    if "registro" in st.session_state:
+    registro = st.session_state.get("registro")
 
-        r = st.session_state["registro"]
+    if registro:
+        r = registro
 
         # =========================
         # CAMPOS
@@ -1313,56 +1317,47 @@ elif menu == "Editar":
         # =========================
         # SALVAR ALTERAÇÕES
         # =========================
-        if st.button(
-            "Salvar alterações"
-        ):
+        if st.button("Salvar alterações"):
         
             # histórico
-            (
-                supabase.table(
-                    "cobrancas_log"
-                )
-                .insert({
-                    "boleto": novo_boleto,
-                    "pagador": novo_pagador,
-                    "valor_cobrado":
-                        novo_valor_cobrado
-                })
-                .execute()
-            )
+            supabase.table("cobrancas_log").insert({
+                "boleto": novo_boleto,
+                "pagador": novo_pagador,
+                "valor_cobrado": novo_valor_cobrado
+            }).execute()
         
             # update
-            (
-                supabase.table(
-                    "cobrancas"
-                )
-                .update({
+            supabase.table("cobrancas").update({
         
-                    "pagador": novo_pagador,
-                    "valor_do_titulo": novo_valor_titulo,
-                    "valor_cobrado": novo_valor_cobrado,
-                    "oscilacao": nova_oscilacao,
-                
-                    "vencimento": str(novo_vencimento),
-                    "data_da_liquidacao": str(nova_data_pagamento),
-                
-                    "lote": novo_lote,
-                    "observacao": nova_observacao,
-                    "evidencia1": nova_evidencia,
-                
-                    "pendente": False,   # 👈 RESOLVE AQUI
-                    "pendente": pendente
-                
-                })
+                "pagador": novo_pagador,
+                "valor_do_titulo": novo_valor_titulo,
+                "valor_cobrado": novo_valor_cobrado,
+                "oscilacao": nova_oscilacao,
         
-                .eq(
-                    "boleto",
-                    st.session_state[
-                        "boleto_edit"
-                    ]
-                )
-                .execute()
-            )
+                "vencimento": str(novo_vencimento),
+                "data_da_liquidacao": str(nova_data_pagamento),
+        
+                "lote": novo_lote,
+                "observacao": nova_observacao,
+                "evidencia1": nova_evidencia,
+        
+                # ✔ aqui está correto agora
+                "pendente": pendente
+        
+            }).eq(
+                "boleto",
+                st.session_state.get("boleto_edit") or r.get("boleto")
+            ).execute()
+        
+            st.success("✅ Registro atualizado!")
+        
+            # =========================
+            # LIMPA ESTADO (IMPORTANTE)
+            # =========================
+            st.session_state["registro"] = None
+            st.session_state["boleto_edit"] = None
+        
+            st.rerun()
         
             # =========================
             # LOG AUDITORIA
