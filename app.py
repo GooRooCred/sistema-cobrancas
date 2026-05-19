@@ -754,20 +754,31 @@ elif menu == "Consulta":
     
         if st.button("🔎 Ver pendentes") or st.session_state.get("ver_pendentes"):
             st.session_state["ver_pendentes"] = True
-    
+        
             st.markdown("### 📌 Pendentes")
-    
-            for item in pendentes.data:
-    
+        
+            # =============================
+            # REMOVE DUPLICADOS
+            # =============================
+            pendentes_unicos = {
+                item["boleto"]: item
+                for item in pendentes.data
+            }.values()
+        
+            # =============================
+            # LOOP CORRETO
+            # =============================
+            for item in pendentes_unicos:
+        
                 label = f"{item['boleto']} - {item.get('pagador','')}"
-    
+        
                 if st.button(label, key=f"pend_{item['boleto']}"):
-    
+        
                     st.session_state["registro"] = item
                     st.session_state["boleto_edit"] = item["boleto"]
                     st.session_state["menu"] = "Editar"
                     st.rerun()
-    
+        
         if st.button("❌ Fechar lista"):
             st.session_state["ver_pendentes"] = False
             st.rerun()
