@@ -624,29 +624,18 @@ elif menu == "Consulta":
     # BUSCA
     # =============================
     col1, col2, col3, col4 = st.columns(
-        [3,3,2,1],
+        [3, 3, 2, 1],
         vertical_alignment="bottom"
     )
-    
-    filtro_boleto = col1.text_input(
-        "Buscar boleto"
-    )
-    
-    filtro_pagador = col2.text_input(
-        "Cliente/Pagador"
-    )
-    
-    filtro_valor = col3.text_input(
-        "Valor Título"
-    )
-    
-    buscar = col4.button(
-        "Buscar",
-        use_container_width=True
-    )
+
+    filtro_boleto = col1.text_input("Buscar boleto")
+    filtro_pagador = col2.text_input("Cliente/Pagador")
+    filtro_valor = col3.text_input("Valor Título")
+
+    buscar = col4.button("Buscar", use_container_width=True)
 
     # =============================
-    # QUERY
+    # QUERY BASE
     # =============================
     query = supabase.table("cobrancas").select(
         "seu_numero, boleto, vencimento, data_da_liquidacao, "
@@ -656,65 +645,30 @@ elif menu == "Consulta":
 
     if buscar:
 
-        # =========================
-        # BOLETO
-        # =========================
         if filtro_boleto:
-            query = query.ilike(
-                "boleto",
-                f"%{filtro_boleto}%"
-            )
-    
-        # =========================
-        # PAGADOR
-        # =========================
+            query = query.ilike("boleto", f"%{filtro_boleto}%")
+
         if filtro_pagador:
-            query = query.ilike(
-                "pagador",
-                f"%{filtro_pagador}%"
-            )
-    
-        # =========================
-        # VALOR TÍTULO
-        # =========================
+            query = query.ilike("pagador", f"%{filtro_pagador}%")
+
         if filtro_valor:
-    
-            valor_busca = to_float(
-                filtro_valor
-            )
-    
-            query = query.eq(
-                "valor_do_titulo",
-                valor_busca
-            )
-    
+            valor_busca = to_float(filtro_valor)
+            query = query.eq("valor_do_titulo", valor_busca)
+
+    # =============================
+    # EXECUTA QUERY
+    # =============================
     res = query.limit(200).execute()
-    
     df = pd.DataFrame(res.data)
-    
+
     # =============================
     # FORMATA DATAS
     # =============================
-    data_cols = [
-        "vencimento",
-        "data_da_liquidacao"
-    ]
+    data_cols = ["vencimento", "data_da_liquidacao"]
 
     for col in data_cols:
-
         if col in df.columns:
-
-            df[col] = pd.to_datetime(
-                df[col],
-                errors="coerce"
-            ).dt.strftime("%d/%m/%Y")
-
-    pendentes = (
-        supabase.table("cobrancas")
-        .select("*")
-        .eq("pendente", True)
-        .execute()
-    )
+            df[col] = pd.to_datetime(df[col], errors="coerce").dt.strftime("%d/%m/%Y")
 
     # =============================
     # FORMATA VALORES
@@ -727,7 +681,6 @@ elif menu == "Consulta":
     ]
 
     for col in valor_cols:
-
         if col in df.columns:
             df[col] = df[col].apply(format_brl)
 
@@ -745,34 +698,41 @@ elif menu == "Consulta":
         .eq("pendente", True)
         .execute()
     )
-    
-    pendentes = (
-    supabase.table("cobrancas")
-    .select("*")
-    .eq("pendente", True)
-    .execute()
-)
 
-if pendentes.data:
+    if pendentes and pendentes.data:
 
-    st.warning(f"⚠️ {len(pendentes.data)} registros pendentes")
+        st.warning(f"⚠️ {len(pendentes.data)} registros pendentes de atualização")
 
-    if st.button("Ver pendentes"):
-        st.session_state["ver_pendentes"] = True
+        if st.button("🔎 Ver pendentes"):
+            st.session_state["ver_pendentes"] = True
 
-    if st.session_state.get("ver_pendentes"):
+        if st.session_state.get("ver_pendentes"):
 
-        for item in pendentes.data:
+            st.markdown("### 📌 Pendentes")
 
-            label = f"{item['boleto']} - {item.get('pagador','')}"
+            for item in pendentes.data:
 
-            if st.button(label, key=f"pend_{item['boleto']}"):
+                label = f"{item['boleto']} - {item.get('pagador','')}"
 
-                st.session_state["registro"] = item
-                st.session_state["boleto_edit"] = item["boleto"]
+                if st.button(label, key=f"pend_{item['boleto']}"):
 
-                st.session_state["menu"] = "Editar"
-                st.rerun()
+                    st.session_state["registro"] = item
+                    st.session_state["boleto_edit"] = item["boleto"]
+
+                    st.session_state["menu"] = "Editar"
+                    st.rerun()
+
+        if st.button("❌ Fechar lista"):
+            st.session_state["ver_pendentes"] = False
+            st.rerun()
+
+    # =============================
+    # RESULTADO PRINCIPAL
+    # =============================
+    st.dataframe(
+        df,
+        use_container_width=True
+    )
 
     # =============================
     # MOSTRAR RESULTADOS
