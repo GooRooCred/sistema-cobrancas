@@ -746,42 +746,33 @@ elif menu == "Consulta":
         .execute()
     )
     
-    if pendentes.data:
+    pendentes = (
+    supabase.table("cobrancas")
+    .select("*")
+    .eq("pendente", True)
+    .execute()
+)
 
-        st.warning(
-            f"⚠️ Você tem {len(pendentes.data)} registros pendentes de atualização"
-        )
-    
-        if st.button("🔎 Ver pendentes") or st.session_state.get("ver_pendentes"):
-            st.session_state["ver_pendentes"] = True
-        
-            st.markdown("### 📌 Pendentes")
-        
-            # =============================
-            # REMOVE DUPLICADOS
-            # =============================
-            pendentes_unicos = {
-                item["boleto"]: item
-                for item in pendentes.data
-            }.values()
-        
-            # =============================
-            # LOOP CORRETO
-            # =============================
-            for item in pendentes_unicos:
-        
-                label = f"{item['boleto']} - {item.get('pagador','')}"
-        
-                if st.button(label, key=f"pend_{item['boleto']}"):
-        
-                    st.session_state["registro"] = item
-                    st.session_state["boleto_edit"] = item["boleto"]
-                    st.session_state["menu"] = "Editar"
-                    st.rerun()
-        
-        if st.button("❌ Fechar lista"):
-            st.session_state["ver_pendentes"] = False
-            st.rerun()
+if pendentes.data:
+
+    st.warning(f"⚠️ {len(pendentes.data)} registros pendentes")
+
+    if st.button("Ver pendentes"):
+        st.session_state["ver_pendentes"] = True
+
+    if st.session_state.get("ver_pendentes"):
+
+        for item in pendentes.data:
+
+            label = f"{item['boleto']} - {item.get('pagador','')}"
+
+            if st.button(label, key=f"pend_{item['boleto']}"):
+
+                st.session_state["registro"] = item
+                st.session_state["boleto_edit"] = item["boleto"]
+
+                st.session_state["menu"] = "Editar"
+                st.rerun()
 
     # =============================
     # MOSTRAR RESULTADOS
@@ -1142,64 +1133,49 @@ elif menu == "Inserir":
 # =============================
 elif menu == "Editar":
 
-    # =============================
-    # PERMISSÃO
-    # =============================
-    if st.session_state.get("perfil") not in [
-        "admin",
-        "superadmin"
-    ]:
+    if st.session_state.get("perfil") not in ["admin", "superadmin"]:
         st.error("⛔ Acesso negado")
         st.stop()
 
     st.title("✏️ Editar")
-    
-    registro = st.session_state.get("registro")
 
-    if not registro:
-        st.info("Nenhum registro selecionado.")
-        st.stop()
+    # =============================
+    # REGISTRO ATIVO (pendente ou manual)
+    # =============================
+    registro = st.session_state.get("registro")
     
-    r = registro
     
     # =============================
     # BUSCAR BOLETO
     # =============================
-    boleto = st.text_input(
-        "Digite o boleto"
-    )
+    boleto = st.text_input("Digite o boleto")
 
     if st.button("Buscar") and boleto:
-
+    
         res = (
             supabase.table("cobrancas")
             .select("*")
             .eq("boleto", boleto)
             .execute()
         )
-
+    
         if res.data:
-
-            st.session_state["registro"] = (
-                res.data[0]
-            )
-
-            st.session_state["boleto_edit"] = (
-                boleto
-            )
-
+            st.session_state["registro"] = res.data[0]
+            st.session_state["boleto_edit"] = boleto
+            st.rerun()
         else:
-            st.warning(
-                "Boleto não encontrado"
-            )
+            st.warning("Boleto não encontrado")
 
     # =============================
     # MOSTRAR REGISTRO
     # =============================
     registro = st.session_state.get("registro")
 
-    if registro:
-        r = registro
+    if not registro:
+        st.info("Busque um boleto ou selecione um pendente.")
+        st.stop()
+    
+    r = registro
 
         # =========================
         # CAMPOS
