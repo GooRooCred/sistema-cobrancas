@@ -689,6 +689,14 @@ elif menu == "Consulta":
     # =============================
     df = df.rename(columns=COLUNAS_AMIGAVEIS)
 
+    pendentes = (
+        supabase.table("cobrancas")
+        .select("*")
+        .eq("pendente", True)
+        .order("vencimento", desc=False)
+        .execute()
+    )
+
     # =============================
     # ALERTA DE PENDENTES
     # =============================
@@ -696,19 +704,20 @@ elif menu == "Consulta":
 
     with st.expander("Ver registros pendentes", expanded=False):
     
-        for item in pendentes.data[:200]:  # limita segurança
+        if pendentes.data:
     
-            col1, col2 = st.columns([4,1])
+            for item in pendentes.data[:200]:
     
-            with col1:
-                st.write(f"📄 {item['boleto']} - {item.get('pagador','')}")
+                col1, col2 = st.columns([4,1])
     
-            with col2:
-                if st.button("Editar", key=f"edit_{item.get('id', item['boleto'])}"):
-                    st.session_state["registro"] = item
-                    st.session_state["boleto_edit"] = item["boleto"]
-                    st.session_state["menu"] = "Editar"
-                    st.rerun()
+                with col1:
+                    st.write(f"📄 {item['boleto']} - {item.get('pagador','')}")
+    
+                with col2:
+                    if st.button("Editar", key=f"edit_{item.get('id', item['boleto'])}"):
+                        st.session_state["registro"] = item
+                        st.session_state["boleto_edit"] = item["boleto"]
+                        st.rerun()
 
     # =============================
     # RESULTADO PRINCIPAL
@@ -892,7 +901,6 @@ elif menu == "Inserir":
                     "observacao": observacao,
                     "evidencia1": evidencia1,
                     
-                    "pendente": True,
                     "pendente": pendente
         
                 }).execute()
