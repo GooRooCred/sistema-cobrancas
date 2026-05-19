@@ -1327,43 +1327,43 @@ elif menu == "Editar":
     
         st.success("✅ Registro atualizado!")
         
-            # =========================
-            # LIMPA ESTADO (IMPORTANTE)
-            # =========================
-            st.session_state["registro"] = None
-            st.session_state["boleto_edit"] = None
-        
-            st.rerun()
-        
-            # =========================
-            # LOG AUDITORIA
-            # =========================
-            registrar_log(
-                acao="EDITAR",
-        
-                boleto=novo_boleto,
-        
-                seu_numero=
-                    novo_seu_numero,
-        
-                pagador=
-                    novo_pagador,
-        
-                valor_anterior=
-                    r.get(
-                        "valor_cobrado"
-                    ),
-        
-                valor_novo=
-                    novo_valor_cobrado,
-        
-                observacao=
-                    "Registro editado"
-            )
-        
-            st.success(
-                "✅ Registro atualizado!"
-            )
+        # =========================
+        # LIMPA ESTADO (IMPORTANTE)
+        # =========================
+        st.session_state["registro"] = None
+        st.session_state["boleto_edit"] = None
+    
+        st.rerun()
+    
+        # =========================
+        # LOG AUDITORIA
+        # =========================
+        registrar_log(
+            acao="EDITAR",
+    
+            boleto=novo_boleto,
+    
+            seu_numero=
+                novo_seu_numero,
+    
+            pagador=
+                novo_pagador,
+    
+            valor_anterior=
+                r.get(
+                    "valor_cobrado"
+                ),
+    
+            valor_novo=
+                novo_valor_cobrado,
+    
+            observacao=
+                "Registro editado"
+        )
+    
+        st.success(
+            "✅ Registro atualizado!"
+        )
 # =============================
 # EXCLUIR
 # =============================
