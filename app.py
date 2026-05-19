@@ -305,6 +305,8 @@ menu = st.sidebar.radio(
 )
 
 st.session_state["menu"] = menu
+st.session_state["menu"] = "Editar"
+st.rerun()
 
 # =============================
 # CONTROLE DE TROCA DE MENU
