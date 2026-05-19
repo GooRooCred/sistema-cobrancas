@@ -727,13 +727,6 @@ elif menu == "Consulta":
         use_container_width=True
     )
 
-    # =============================
-    # MOSTRAR RESULTADOS
-    # =============================
-    st.dataframe(
-        df,
-        use_container_width=True
-    )
 
     # =============================
     # DETALHES DA PESQUISA
