@@ -295,10 +295,16 @@ else:
     ]
 
 # 🔥 ESTA PARTE É OBRIGATÓRIA
+if "menu" not in st.session_state:
+    st.session_state["menu"] = "Dashboard"
+
 menu = st.sidebar.radio(
     "📌 Menu",
-    opcoes_menu
+    opcoes_menu,
+    index=opcoes_menu.index(st.session_state["menu"])
 )
+
+st.session_state["menu"] = menu
 
 # =============================
 # CONTROLE DE TROCA DE MENU
