@@ -692,39 +692,23 @@ elif menu == "Consulta":
     # =============================
     # ALERTA DE PENDENTES
     # =============================
-    pendentes = (
-        supabase.table("cobrancas")
-        .select("*")
-        .eq("pendente", True)
-        .execute()
-    )
+    st.markdown("### 📌 Pendentes")
 
-    if pendentes and pendentes.data:
-
-        st.warning(f"⚠️ {len(pendentes.data)} registros pendentes de atualização")
-
-        if st.button("🔎 Ver pendentes"):
-            st.session_state["ver_pendentes"] = True
-
-        if st.session_state.get("ver_pendentes"):
-
-            st.markdown("### 📌 Pendentes")
-
-            for item in pendentes.data:
-
-                label = f"{item['boleto']} - {item.get('pagador','')}"
-
-                if st.button(label, key=f"pend_{item['boleto']}"):
-
+    with st.expander("Ver registros pendentes", expanded=False):
+    
+        for item in pendentes.data[:200]:  # limita segurança
+    
+            col1, col2 = st.columns([4,1])
+    
+            with col1:
+                st.write(f"📄 {item['boleto']} - {item.get('pagador','')}")
+    
+            with col2:
+                if st.button("Editar", key=f"edit_{item.get('id', item['boleto'])}"):
                     st.session_state["registro"] = item
                     st.session_state["boleto_edit"] = item["boleto"]
-
                     st.session_state["menu"] = "Editar"
                     st.rerun()
-
-        if st.button("❌ Fechar lista"):
-            st.session_state["ver_pendentes"] = False
-            st.rerun()
 
     # =============================
     # RESULTADO PRINCIPAL
